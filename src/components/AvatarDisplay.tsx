@@ -146,6 +146,22 @@ export const AvatarDisplay: React.FC<AvatarDisplayProps> = ({
                 <line x1="16" y1="52" x2="6" y2="64" stroke="#06B6D4" strokeWidth="1" opacity="0.5" />
                 <line x1="48" y1="52" x2="58" y2="64" stroke="#06B6D4" strokeWidth="1" opacity="0.5" />
               </g>
+            ) : avatar.background === 'bg_clean_paradise' ? (
+              <g id="bg-pixel-clean-beach">
+                <rect x="0" y="0" width="64" height="20" fill="#38BDF8" />
+                <rect x="0" y="20" width="64" height="18" fill="#7DD3FC" />
+                <rect x="0" y="38" width="64" height="12" fill="#06B6D4" />
+                <rect x="0" y="50" width="64" height="14" fill="#FEF08A" />
+                {/* Sun & Sea Sparkles */}
+                <rect x="48" y="4" width="8" height="8" fill="#FACC15" />
+                <rect x="10" y="42" width="4" height="1.5" fill="#FFFFFF" opacity="0.8" />
+                <rect x="28" y="46" width="6" height="1.5" fill="#FFFFFF" opacity="0.8" />
+                <rect x="44" y="40" width="5" height="1.5" fill="#FFFFFF" opacity="0.8" />
+                {/* Palm Tree in Distance */}
+                <rect x="4" y="26" width="3" height="14" fill="#78350F" />
+                <polygon points="5,26 -2,22 4,24" fill="#15803D" />
+                <polygon points="5,26 12,22 6,24" fill="#15803D" />
+              </g>
             ) : avatar.background === 'bg_starry_sky' ? (
               <g id="bg-pixel-starry">
                 <rect x="0" y="0" width="64" height="64" fill="#0B0F19" />
@@ -212,6 +228,19 @@ export const AvatarDisplay: React.FC<AvatarDisplayProps> = ({
               <rect x="16" y="38" width="32" height="18" fill="#059669" />
               <rect x="18" y="40" width="28" height="15" fill="#10B981" />
               <rect x="20" y="53" width="24" height="3" fill="#047857" />
+            </g>
+          )}
+
+          {avatar.back === 'back_plasma_wings' && (
+            <g id="pixel-plasma-wings" className="animate-pixel-float">
+              {/* Left Plasma Wing */}
+              <polygon points="12,24 -2,12 8,36" fill="#06B6D4" opacity="0.85" />
+              <polygon points="10,26 2,16 8,32" fill="#67E8F9" />
+              <line x1="8" y1="28" x2="0" y2="16" stroke="#FFFFFF" strokeWidth="1.5" />
+              {/* Right Plasma Wing */}
+              <polygon points="52,24 66,12 56,36" fill="#06B6D4" opacity="0.85" />
+              <polygon points="54,26 62,16 56,32" fill="#67E8F9" />
+              <line x1="56" y1="28" x2="64" y2="16" stroke="#FFFFFF" strokeWidth="1.5" />
             </g>
           )}
 
@@ -447,6 +476,20 @@ export const AvatarDisplay: React.FC<AvatarDisplayProps> = ({
               <rect x="13" y="37" width="8" height="7" fill="#0F172A" />
               <rect x="43" y="37" width="8" height="7" fill="#0F172A" />
             </g>
+          ) : avatar.clothes === 'cloth_clean_ranger' ? (
+            <g id="pixel-clean-ranger">
+              <rect x="18" y="36" width="28" height="14" fill="#047857" />
+              <rect x="20" y="37" width="24" height="13" fill="#10B981" />
+              {/* Tactical White/Orange Chest Straps */}
+              <rect x="20" y="41" width="24" height="2" fill="#FFFFFF" />
+              <rect x="30" y="37" width="4" height="13" fill="#F97316" />
+              <rect x="31" y="41" width="2" height="2" fill="#FFFFFF" />
+              {/* Arm Guards */}
+              <rect x="13" y="37" width="8" height="8" fill="#047857" />
+              <rect x="13" y="41" width="8" height="2" fill="#F97316" />
+              <rect x="43" y="37" width="8" height="8" fill="#047857" />
+              <rect x="43" y="41" width="8" height="2" fill="#F97316" />
+            </g>
           ) : avatar.clothes === 'cloth_world_champion' ? (
             <g id="pixel-world-cloak">
               <rect x="17" y="36" width="30" height="15" fill="#083344" />
@@ -628,6 +671,20 @@ export const AvatarDisplay: React.FC<AvatarDisplayProps> = ({
               <rect x="18" y="-1.5" width="28" height="2" fill="#FEF08A" />
             </g>
           )}
+
+          {avatar.hat === 'hat_purifier_crown' && (
+            <g id="pixel-hat-purifier-crown">
+              {/* Crown Base */}
+              <polygon points="12,6 18,1 24,6 32,-1 40,6 46,1 52,6 50,11 14,11" fill="#059669" />
+              <rect x="14" y="9" width="36" height="3" fill="#10B981" />
+              {/* Emerald Gems */}
+              <rect x="22" y="8" width="3" height="3" fill="#34D399" />
+              <rect x="31" y="5" width="3" height="4" fill="#6EE7B7" />
+              <rect x="39" y="8" width="3" height="3" fill="#34D399" />
+              {/* Purifier Waterdrop Halo */}
+              <rect x="31" y="-4" width="2" height="3" fill="#38BDF8" className="animate-bounce-gentle" />
+            </g>
+          )}
         </g>
 
         {/* ============================================================ */}
@@ -775,12 +832,43 @@ export const AvatarDisplay: React.FC<AvatarDisplayProps> = ({
               <rect x="6" y="14" width="4" height="3" fill="#38BDF8" />
             </g>
           )}
+
+          {avatar.pet === 'pet_pure_slime' && (
+            <g id="pixel-pet-pure-slime" transform="translate(44, 42)" className="animate-bounce-gentle">
+              <ellipse cx="7" cy="8" rx="6" ry="5" fill="#38BDF8" />
+              <ellipse cx="7" cy="7" rx="5" ry="4" fill="#7DD3FC" />
+              {/* Cute Waterdrop Sprout */}
+              <rect x="6" y="1" width="2" height="3" fill="#0284C7" />
+              {/* Slime Face */}
+              <rect x="4" y="6" width="2" height="2" fill="#0369A1" />
+              <rect x="8" y="6" width="2" height="2" fill="#0369A1" />
+              <rect x="6" y="8" width="2" height="1" fill="#F43F5E" />
+              {/* Sparkle */}
+              <rect x="3" y="4" width="1.5" height="1.5" fill="#FFFFFF" />
+            </g>
+          )}
         </g>
 
         {/* ============================================================ */}
         {/* 10. LAYER: SPECIAL EFFECT (特殊ドットエフェクト) */}
         {/* ============================================================ */}
         <g id="layer-pixel-effect">
+          {avatar.special === 'spec_purify_rays' && (
+            <g id="pixel-effect-purify-rays" className="animate-pulse">
+              <polygon points="20,0 44,0 52,64 12,64" fill="url(#purifyRayGrad)" opacity="0.35" />
+              <defs>
+                <linearGradient id="purifyRayGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#67E8F9" stopOpacity="0.8" />
+                  <stop offset="100%" stopColor="#34D399" stopOpacity="0.1" />
+                </linearGradient>
+              </defs>
+              <rect x="22" y="8" width="2" height="2" fill="#FFFFFF" className="animate-sparkle" />
+              <rect x="40" y="14" width="2" height="2" fill="#FEF08A" className="animate-sparkle" />
+              <rect x="18" y="32" width="2" height="2" fill="#67E8F9" className="animate-sparkle" />
+              <rect x="44" y="40" width="2" height="2" fill="#34D399" className="animate-sparkle" />
+            </g>
+          )}
+
           {avatar.special === 'spec_leaf_swirl' && (
             <g id="pixel-effect-leaves">
               <rect x="10" y="38" width="3" height="3" fill="#10B981" className="animate-sparkle" />
@@ -826,6 +914,67 @@ export const AvatarDisplay: React.FC<AvatarDisplayProps> = ({
               <rect x="54" y="12" width="2" height="2" fill="#818CF8" className="animate-sparkle" />
               <rect x="12" y="44" width="2" height="2" fill="#38BDF8" className="animate-sparkle" />
               <rect x="50" y="48" width="2" height="2" fill="#F472B6" className="animate-sparkle" />
+            </g>
+          )}
+        </g>
+
+        {/* ============================================================ */}
+        {/* 11. LAYER: WEAPONS & HELD GEAR (武器・道具・盾) */}
+        {/* ============================================================ */}
+        <g id="layer-pixel-weapon">
+          {avatar.weapon === 'wpn_tongs_blade' && (
+            <g id="pixel-tongs-blade" transform="translate(46, 30)">
+              {/* Grip */}
+              <rect x="4" y="14" width="3" height="6" fill="#1E293B" />
+              {/* Tongs metallic arms */}
+              <rect x="3" y="2" width="2" height="13" fill="#94A3B8" />
+              <rect x="7" y="2" width="2" height="13" fill="#CBD5E1" />
+              {/* Tongs tips */}
+              <polygon points="3,2 1,5 3,5" fill="#64748B" />
+              <polygon points="9,2 11,5 9,5" fill="#64748B" />
+              {/* Green energy glow */}
+              <rect x="4" y="6" width="4" height="2" fill="#22C55E" />
+            </g>
+          )}
+
+          {avatar.weapon === 'wpn_gaia_staff' && (
+            <g id="pixel-gaia-staff" transform="translate(46, 22)" className="animate-pixel-float">
+              {/* Staff Shaft */}
+              <rect x="4" y="6" width="3" height="26" fill="#78350F" />
+              <rect x="5" y="6" width="1" height="26" fill="#B45309" />
+              {/* Staff Head World Tree Crystal */}
+              <polygon points="5,-2 0,5 5,12 10,5" fill="#10B981" />
+              <polygon points="5,0 2,5 5,10 8,5" fill="#6EE7B7" />
+              <circle cx="5.5" cy="5" r="1.5" fill="#FFFFFF" className="animate-sparkle" />
+              {/* Vine Sprout */}
+              <rect x="2" y="12" width="2" height="3" fill="#22C55E" />
+              <rect x="7" y="16" width="2" height="3" fill="#22C55E" />
+            </g>
+          )}
+
+          {avatar.weapon === 'wpn_eco_shield' && (
+            <g id="pixel-eco-shield" transform="translate(8, 34)">
+              {/* Shield Plate */}
+              <polygon points="6,2 16,2 18,10 11,20 4,10" fill="#0284C7" opacity="0.8" />
+              <polygon points="7,4 15,4 16,10 11,18 6,10" fill="#38BDF8" opacity="0.9" />
+              <circle cx="11" cy="9" r="3" fill="#FFFFFF" opacity="0.8" />
+              {/* Recycle Arrow on Shield */}
+              <polygon points="11,7 13,10 9,10" fill="#0284C7" />
+            </g>
+          )}
+
+          {avatar.weapon === 'wpn_recycle_saber' && (
+            <g id="pixel-recycle-saber" transform="translate(46, 20)">
+              {/* Hilt */}
+              <rect x="4" y="20" width="4" height="6" fill="#0F172A" />
+              <rect x="3" y="19" width="6" height="2" fill="#F59E0B" />
+              {/* Glowing Laser Blade */}
+              <rect x="4.5" y="0" width="3" height="19" fill="#06B6D4" className="animate-pulse" />
+              <rect x="5" y="0" width="2" height="19" fill="#FFFFFF" />
+              <polygon points="6,-3 4.5,0 7.5,0" fill="#FFFFFF" />
+              {/* Aura Particles */}
+              <circle cx="3" cy="6" r="1" fill="#67E8F9" className="animate-sparkle" />
+              <circle cx="9" cy="12" r="1" fill="#67E8F9" className="animate-sparkle" />
             </g>
           )}
         </g>
