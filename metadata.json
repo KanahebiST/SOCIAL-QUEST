@@ -1,0 +1,6 @@
+{
+  "name": "SOCIAL QUEST",
+  "description": "現実の社会貢献活動をゲーム感覚で楽しみ、XPやアイテムを獲得してアバターやSOCIAL TREEを育てるソーシャルクエストアプリ",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

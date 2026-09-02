@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'DotGothic16', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+}
+
+.font-pixel {
+  font-family: 'DotGothic16', monospace, sans-serif;
+}
+
+.font-press-start {
+  font-family: 'Press Start 2P', monospace, sans-serif;
+}
+
+.font-silkscreen {
+  font-family: 'Silkscreen', monospace, sans-serif;
+}
+
+.pixelated {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* Retro RPG Box Borders */
+.pixel-box {
+  border: 4px solid #1e293b;
+  box-shadow: inset 0 0 0 2px #334155, 0 4px 0 0 #0f172a;
+}
+
+.pixel-box-emerald {
+  border: 4px solid #065f46;
+  box-shadow: inset 0 0 0 2px #10b981, 0 4px 0 0 #022c22;
+}
+
+.pixel-box-gold {
+  border: 4px solid #78350f;
+  box-shadow: inset 0 0 0 2px #f59e0b, 0 4px 0 0 #451a03;
+}
+
+.pixel-box-purple {
+  border: 4px solid #581c87;
+  box-shadow: inset 0 0 0 2px #a855f7, 0 4px 0 0 #3b0764;
+}
+
+.pixel-btn {
+  position: relative;
+  transition: all 0.1s ease;
+  box-shadow: 0 4px 0 0 rgba(0, 0, 0, 0.4);
+}
+
+.pixel-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Retro Scanlines */
+.scanlines {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.04),
+    rgba(0, 255, 0, 0.02),
+    rgba(0, 0, 255, 0.04)
+  );
+  background-size: 100% 4px, 6px 100%;
+  pointer-events: none;
+}
+
+@keyframes bounceSubtle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes pixelFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes pixelPulseGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px rgba(16, 185, 129, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.9));
+  }
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.8) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.2) rotate(45deg); }
+}
+
+.animate-pixel-float {
+  animation: pixelFloat 2s steps(4, jump-none) infinite;
+}
+
+.animate-pixel-glow {
+  animation: pixelPulseGlow 2.5s ease-in-out infinite;
+}
+
+.animate-sparkle {
+  animation: sparkle 1.5s infinite;
+}
+
+.animate-bounce-subtle {
+  animation: bounceSubtle 3s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+.animate-scale-up {
+  animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
