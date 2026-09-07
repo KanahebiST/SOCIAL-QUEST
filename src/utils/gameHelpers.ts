@@ -41,14 +41,12 @@ export function getCategoryCounts(contributions: Contribution[]): Record<Categor
   const counts: Record<CategoryType, number> = {
     environment: 0,
     support: 0,
-    community: 0,
-    volunteer: 0,
     learning: 0,
   };
 
   contributions.forEach((c) => {
-    if (counts[c.category] !== undefined) {
-      counts[c.category]++;
+    if (counts[c.category as CategoryType] !== undefined) {
+      counts[c.category as CategoryType]++;
     }
   });
 
@@ -212,22 +210,18 @@ export function evaluateContributionType(contributions: Contribution[]): Contrib
   const xpTotals: Record<CategoryType, number> = {
     environment: 0,
     support: 0,
-    community: 0,
-    volunteer: 0,
     learning: 0,
   };
 
   contributions.forEach((c) => {
-    if (xpTotals[c.category] !== undefined) {
-      xpTotals[c.category] += c.xpEarned;
+    if (xpTotals[c.category as CategoryType] !== undefined) {
+      xpTotals[c.category as CategoryType] += c.xpEarned;
     }
   });
 
   const breakdowns: CategoryBreakdown[] = [
     { category: 'environment', count: counts.environment, xpTotal: xpTotals.environment, percentage: Math.round((counts.environment / total) * 100) },
     { category: 'support', count: counts.support, xpTotal: xpTotals.support, percentage: Math.round((counts.support / total) * 100) },
-    { category: 'community', count: counts.community, xpTotal: xpTotals.community, percentage: Math.round((counts.community / total) * 100) },
-    { category: 'volunteer', count: counts.volunteer, xpTotal: xpTotals.volunteer, percentage: Math.round((counts.volunteer / total) * 100) },
     { category: 'learning', count: counts.learning, xpTotal: xpTotals.learning, percentage: Math.round((counts.learning / total) * 100) },
   ];
 
@@ -235,15 +229,15 @@ export function evaluateContributionType(contributions: Contribution[]): Contrib
   const sorted = [...breakdowns].sort((a, b) => b.count - a.count);
   const top = sorted[0];
 
-  // If at least 3 categories have actions and top is <= 45%, treat as all-rounder
+  // If at least 2 categories have actions and top is <= 55%, treat as all-rounder
   const activeCategories = breakdowns.filter((b) => b.count > 0).length;
 
-  if (activeCategories >= 3 && top.percentage <= 45) {
+  if (activeCategories >= 2 && top.percentage <= 55) {
     return {
       id: 'allRounder',
       title: 'オールラウンダー',
       badge: '🌍',
-      tagline: '多角的な視野で社会の様々な課題にバランスよく貢献する万能プレイヤー',
+      tagline: '環境・支援・学習啓発の3大領域をバランスよく実践する万能プレイヤー',
       color: '#10B981',
       bgClass: 'from-emerald-500 to-teal-600',
       breakdowns,
@@ -267,33 +261,9 @@ export function evaluateContributionType(contributions: Contribution[]): Contrib
       id: 'supporter',
       title: 'サポーター',
       badge: '💫',
-      tagline: '募金や支援を通じて困っている人々の支えとなる温かな心の持ち主',
+      tagline: '困っている人々や社会活動を支える温かな思いやりの持ち主',
       color: '#F59E0B',
       bgClass: 'from-amber-500 to-orange-600',
-      breakdowns,
-    };
-  }
-
-  if (top.category === 'community') {
-    return {
-      id: 'communityMaker',
-      title: 'コミュニティメーカー',
-      badge: '🤝',
-      tagline: '地域清掃やイベントを支え、街の絆と活気を育てる頼もしい力',
-      color: '#3B82F6',
-      bgClass: 'from-blue-500 to-indigo-600',
-      breakdowns,
-    };
-  }
-
-  if (top.category === 'volunteer') {
-    return {
-      id: 'volunteerHero',
-      title: 'ボランティアヒーロー',
-      badge: '🛡️',
-      tagline: '困っている現場へ駆けつけ、直接的な行動で人々を救う情熱の勇者',
-      color: '#8B5CF6',
-      bgClass: 'from-purple-500 to-violet-600',
       breakdowns,
     };
   }
@@ -372,7 +342,7 @@ export function evaluateAchievements(user: UserProfile): {
     } else if (ach.id === 'ach_recycle_beginner') {
       currentCount = counts.environment;
     } else if (ach.id === 'ach_community_power') {
-      currentCount = counts.community;
+      currentCount = totalContributions;
     } else if (ach.id === 'ach_warm_supporter') {
       currentCount = counts.support;
     } else if (ach.id === 'ach_knowledge_seeker') {

@@ -212,7 +212,7 @@ export const ContributionModal: React.FC<ContributionModalProps> = ({
               </label>
               <span className="text-[9px] font-pixel text-slate-500">手動アクション</span>
             </div>
-            <div className="grid grid-cols-5 gap-1 p-1 bg-slate-950 rounded-xl border border-slate-800">
+            <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-950 rounded-xl border border-slate-800">
               {(Object.keys(CATEGORIES) as CategoryType[]).map((catKey) => {
                 const cat = CATEGORIES[catKey];
                 const isSelected = selectedCategory === catKey;

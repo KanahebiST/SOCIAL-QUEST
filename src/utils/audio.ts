@@ -117,6 +117,87 @@ class AudioManager {
     this.play8BitTone(1174.66, 0.35, now + 0.24, 'square', 0.15); // D6
   }
 
+  // Battle: Attack Swing
+  public playAttack() {
+    this.initCtx();
+    if (!this.ctx || !this.soundEnabled) return;
+    const now = this.ctx.currentTime;
+    this.play8BitTone(600, 0.04, now, 'sawtooth', 0.12);
+    this.play8BitTone(300, 0.06, now + 0.03, 'square', 0.1);
+  }
+
+  // Battle: Hit Impact
+  public playHit() {
+    this.initCtx();
+    if (!this.ctx || !this.soundEnabled) return;
+    const now = this.ctx.currentTime;
+    this.play8BitTone(180, 0.08, now, 'triangle', 0.18);
+    this.play8BitTone(90, 0.1, now + 0.04, 'square', 0.14);
+  }
+
+  // Battle: Critical Hit
+  public playCritical() {
+    this.initCtx();
+    if (!this.ctx || !this.soundEnabled) return;
+    const now = this.ctx.currentTime;
+    this.play8BitTone(350, 0.05, now, 'square', 0.15);
+    this.play8BitTone(700, 0.06, now + 0.04, 'sawtooth', 0.18);
+    this.play8BitTone(1050, 0.15, now + 0.09, 'square', 0.18);
+  }
+
+  // Battle: Social Skill Magic / Buff
+  public playMagic() {
+    this.initCtx();
+    if (!this.ctx || !this.soundEnabled) return;
+    const now = this.ctx.currentTime;
+    this.play8BitTone(523.25, 0.06, now, 'sine', 0.12);
+    this.play8BitTone(659.25, 0.06, now + 0.05, 'sine', 0.12);
+    this.play8BitTone(880.0, 0.08, now + 0.1, 'triangle', 0.15);
+    this.play8BitTone(1046.5, 0.2, now + 0.16, 'sine', 0.15);
+  }
+
+  // Battle: Heal
+  public playHeal() {
+    this.initCtx();
+    if (!this.ctx || !this.soundEnabled) return;
+    const now = this.ctx.currentTime;
+    this.play8BitTone(440, 0.08, now, 'triangle', 0.1);
+    this.play8BitTone(554.37, 0.08, now + 0.06, 'triangle', 0.1);
+    this.play8BitTone(659.25, 0.12, now + 0.12, 'sine', 0.12);
+    this.play8BitTone(880, 0.2, now + 0.18, 'sine', 0.12);
+  }
+
+  // Battle: Purify / Reconciliation Chime
+  public playPurify() {
+    this.initCtx();
+    if (!this.ctx || !this.soundEnabled) return;
+    const now = this.ctx.currentTime;
+    const notes = [659.25, 830.61, 987.77, 1318.51]; // E5, G#5, B5, E6
+    notes.forEach((freq, idx) => {
+      this.play8BitTone(freq, 0.15 + idx * 0.05, now + idx * 0.08, 'sine', 0.12);
+    });
+  }
+
+  // Battle: Victory Fanfare
+  public playVictory() {
+    this.initCtx();
+    if (!this.ctx || !this.soundEnabled) return;
+    const now = this.ctx.currentTime;
+    const notes = [
+      { f: 523.25, d: 0.1 },  // C5
+      { f: 659.25, d: 0.1 },  // E5
+      { f: 783.99, d: 0.1 },  // G5
+      { f: 1046.5, d: 0.2 },  // C6
+      { f: 880.0, d: 0.1 },   // A5
+      { f: 1046.5, d: 0.4 },  // C6
+    ];
+    let offset = 0;
+    notes.forEach((n) => {
+      this.play8BitTone(n.f, n.d, now + offset, 'square', 0.12);
+      offset += n.d * 0.9;
+    });
+  }
+
   // Error / Warning
   public playError() {
     this.initCtx();

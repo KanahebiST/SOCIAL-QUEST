@@ -15,15 +15,16 @@ export const AvatarView: React.FC<AvatarViewProps> = ({
   user,
   onSaveAvatar,
 }) => {
-  const [currentConfig, setCurrentConfig] = useState<AvatarConfig>({ ...user.equippedItems });
+  const [currentConfig, setCurrentConfig] = useState<AvatarConfig>({ ...(user.avatar || user.equippedItems) });
   const [mainViewMode, setMainViewMode] = useState<'equip' | 'itembox'>('equip');
-  const [activeCategory, setActiveCategory] = useState<AvatarCategory>('clothes');
+  const [activeCategory, setActiveCategory] = useState<AvatarCategory>('weapon');
   const [rarityFilter, setRarityFilter] = useState<string>('all');
   const [selectedItemDetail, setSelectedItemDetail] = useState<AvatarItem | null>(null);
   const [saveToast, setSaveToast] = useState<boolean>(false);
   const [copiedToast, setCopiedToast] = useState<boolean>(false);
 
   const categories: { id: AvatarCategory; label: string; icon: string }[] = [
+    { id: 'weapon', label: '武器・盾', icon: '⚔️' },
     { id: 'clothes', label: '衣装', icon: '👕' },
     { id: 'hat', label: '帽子', icon: '🧢' },
     { id: 'hair', label: '髪型', icon: '💇' },
@@ -43,7 +44,7 @@ export const AvatarView: React.FC<AvatarViewProps> = ({
     { name: 'サクラピンク', color: '#EC4899' },
   ];
 
-  const unlockedSet = new Set(user.unlockedItemIds);
+  const unlockedSet = new Set([...(user.unlockedItems || []), ...(user.unlockedItemIds || [])]);
 
   // Filter items
   const categoryItems = RPG_ITEMS.filter((i) => {
@@ -68,6 +69,7 @@ export const AvatarView: React.FC<AvatarViewProps> = ({
     audio.playEquip();
     setCurrentConfig((prev) => {
       const next = { ...prev };
+      if (item.category === 'weapon') next.weapon = item.id;
       if (item.category === 'skin') next.skinColor = item.id;
       if (item.category === 'hair') next.hairStyle = item.svgType;
       if (item.category === 'clothes') next.clothes = item.id;
@@ -90,7 +92,7 @@ export const AvatarView: React.FC<AvatarViewProps> = ({
 
   const handleReset = () => {
     audio.playClick();
-    setCurrentConfig({ ...user.equippedItems });
+    setCurrentConfig({ ...(user.avatar || user.equippedItems) });
   };
 
   const handleShare = () => {
