@@ -8,7 +8,12 @@ export const MONSTERS: Monster[] = [
     id: 'mon_plastic_slime',
     name: 'プラスチックスライム',
     title: '海辺に漂うプラスチックの化身',
-    subtitle: 'STAGE 1: 沿岸のゴミ溜まり',
+  // STAGE 1
+subtitle: 'STAGE 1: 沿岸のゴミ溜まり',
+mapTheme: 'coast',
+
+
+
     level: 1,
     category: 'environment',
     weaknesses: ['environment'],
@@ -90,7 +95,9 @@ export const MONSTERS: Monster[] = [
     id: 'mon_smog_ghost',
     name: 'スモッグゴースト',
     title: '街を覆う有害排出ガスの妖魔',
-    subtitle: 'STAGE 2: 高速道路下の薄暗い路地',
+  // スモッグゴースト
+subtitle: 'STAGE 2: 高速道路下の薄暗い路地',
+mapTheme: 'smog',
     level: 3,
     category: 'environment',
     weaknesses: ['environment'],
@@ -172,7 +179,10 @@ export const MONSTERS: Monster[] = [
     id: 'mon_food_loss_demon',
     name: 'フードロスデーモン',
     title: '廃棄食品の怨念が宿った暴食魔',
-    subtitle: 'STAGE 3: 閉店後のバックヤード',
+  
+// フードロスデーモン
+subtitle: 'STAGE 3: 閉店後のバックヤード',
+mapTheme: 'backyard',
     level: 5,
     category: 'support',
     weaknesses: ['support'],
@@ -244,7 +254,10 @@ export const MONSTERS: Monster[] = [
     id: 'mon_fake_news_golem',
     name: 'フェイクニュースゴーレム',
     title: 'デマと不確実な噂の泥人形',
-    subtitle: 'STAGE 4: 電脳データの荒野',
+ 
+// フェイクニュースゴーレム
+subtitle: 'STAGE 4: 電脳データの荒野',
+mapTheme: 'cyber',
     level: 7,
     category: 'learning',
     weaknesses: ['learning'],
@@ -316,7 +329,10 @@ export const MONSTERS: Monster[] = [
     id: 'mon_carbon_titan',
     name: 'メガ・カーボンギガント',
     title: '地球温暖化と熱波の超巨神',
-    subtitle: 'STAGE 5 BOSS: 沸騰する都市の頂上',
+  
+// メガ・カーボンギガント
+subtitle: 'STAGE 5 BOSS: 沸騰する都市の頂上',
+mapTheme: 'boss',
     level: 10,
     category: 'all',
     weaknesses: ['environment', 'support', 'learning'],

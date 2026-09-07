@@ -153,16 +153,11 @@ export const SocialView: React.FC<SocialViewProps> = ({
       {/* --- TAB 1: WORLD MAP VIEW --- */}
       {viewTab === 'map' && (
         <div className="space-y-4">
-          <SocialWorldMap
-            userContributionsCount={user.contributions.length}
-            onSelectArea={(area) => {
-              audio.playClick();
-              if (area.targetCategory) {
-                setActiveCategory(area.targetCategory as CategoryType);
-                setViewTab('activities');
-              }
-            }}
-          />
+        <SocialWorldMap
+  onSelectArea={(area) => {
+    setActiveCategory(area.category);
+  }}
+/>
         </div>
       )}
 
