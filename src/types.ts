@@ -1,17 +1,15 @@
 
-export type CategoryType = 'environment' | 'support' | 'learning';
-
-export type ContributionTypeId = 
-  | 'ecologist'       // 環境系多め
-  | 'supporter'       // 支援系多め
-  | 'socialLearner'   // 学習・啓発多め
-  | 'allRounder';     // バランス型
 export type CategoryType =
   | 'environment'
   | 'support'
   | 'community'
   | 'volunteer'
   | 'learning';
+
+export type ContributionTypeId = 
+  | 'ecologist'       // 環境系多め
+  | 'supporter'       // 支援系多め
+  | 'socialLearner'   // 学習・啓発多め
   | 'allRounder'      // バランス型
   | 'communityMaker'  // 互換性保持
   | 'volunteerHero';  // 互換性保持

@@ -41,6 +41,8 @@ export function getCategoryCounts(contributions: Contribution[]): Record<Categor
   const counts: Record<CategoryType, number> = {
     environment: 0,
     support: 0,
+    community: 0,
+    volunteer: 0,
     learning: 0,
   };
 
@@ -243,6 +245,8 @@ export function evaluateContributionType(contributions: Contribution[]): Contrib
   const xpTotals: Record<CategoryType, number> = {
     environment: 0,
     support: 0,
+    community: 0,
+    volunteer: 0,
     learning: 0,
   };
 

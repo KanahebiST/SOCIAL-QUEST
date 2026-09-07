@@ -761,24 +761,6 @@ const STAGE_BACKDROPS: Record<string, string> = {
                 <h3 className="text-xl sm:text-2xl font-black text-white mt-1">社会課題モンスターマップ</h3>
                 <p className="text-xs text-slate-400 mt-2">ステージをクリアして次の敵へ進もう</p>
               </div>
-                    {/* Stats & Weakness Preview */}
-                    <div className="grid grid-cols-3 gap-1.5 sm:gap-2 bg-slate-950/60 p-2 sm:p-2.5 rounded-lg text-[11px] sm:text-xs mb-3 sm:mb-4">
-                      <div>
-                        <span className="text-slate-500">HP:</span>{' '}
-                        <span className="font-bold text-slate-200">{mon.maxHp}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500">ATK:</span>{' '}
-                        <span className="font-bold text-rose-300">{mon.attack}</span>
-                      </div>
-                      <div className="truncate">
-                        <span className="text-slate-500">弱点:</span>{' '}
-                        <span className="font-bold text-emerald-300">
-                          {mon.weaknesses.map((w) => (w === 'environment' ? '環境' : w === 'support' ? '支援' : '学習')).join('/')}
-                        </span>
-                      </div>
-                    </div>
-
               <div className="absolute inset-x-0 top-28 bottom-20 pointer-events-none z-20">
                 <svg viewBox="0 0 400 1000" preserveAspectRatio="none" className="w-full h-full">
                   <defs>
