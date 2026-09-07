@@ -3,7 +3,7 @@ import { UserProfile, Mission } from '../types';
 import { AvatarDisplay } from '../components/AvatarDisplay';
 import { SocialTreeDisplay } from '../components/SocialTreeDisplay';
 import { CategoryPieChart } from '../components/CategoryPieChart';
-import { evaluateContributionType, getCategoryCounts, getVerifiedRecycleCount } from '../utils/gameHelpers';
+import { evaluateContributionType, getCategoryCounts, getTodayDateString, getVerifiedRecycleCount } from '../utils/gameHelpers';
 import { CATEGORIES } from '../data/initialData';
 import { Sparkles, ArrowRight, CheckCircle, ChevronRight, Plus, Shirt, Globe, Flame, Camera, ShieldCheck, Compass, Swords } from 'lucide-react';
 import { audio } from '../utils/audio';
@@ -34,6 +34,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const typeResult = evaluateContributionType(user.contributions);
   const categoryCounts = getCategoryCounts(user.contributions);
   const verifiedRecycleCount = getVerifiedRecycleCount(user);
+  const receivedLoginBonusToday = user.lastLoginBonusDate === getTodayDateString();
 
   // Find today's recommended mission
   const todaysMission = user.missions.find((m) => m.type === 'daily' && !m.claimed) || user.missions[0];
@@ -253,6 +254,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </span>
           </div>
         </div>
+
+        {receivedLoginBonusToday && (
+          <section className="bg-amber-950/70 pixel-box-gold rounded-2xl p-3.5 sm:p-4 text-amber-100 shadow-xl flex items-center gap-3 animate-fade-in">
+            <div className="text-2xl sm:text-3xl" aria-hidden="true">🎁</div>
+            <div className="min-w-0">
+              <p className="font-bold font-pixel text-sm sm:text-base text-amber-300">デイリーログインボーナス獲得！</p>
+              <p className="text-xs sm:text-sm font-pixel text-amber-100/80">+30 XP / +50 ソーシャルコイン　明日も遊びに来てね</p>
+            </div>
+          </section>
+        )}
 
         {/* 2. Today's Quest Hero Card */}
         {todaysMission && (
