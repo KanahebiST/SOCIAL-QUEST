@@ -76,6 +76,39 @@ export function getTodayDateString(): string {
   return `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}`;
 }
 
+const DAILY_LOGIN_XP = 30;
+const DAILY_LOGIN_COINS = 50;
+
+function getYesterdayDateString(): string {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return `${yesterday.getFullYear()}/${String(yesterday.getMonth() + 1).padStart(2, '0')}/${String(yesterday.getDate()).padStart(2, '0')}`;
+}
+
+function normalizeDateString(date: string): string {
+  return date.replace(/-/g, '/').slice(0, 10);
+}
+
+function applyDailyLoginBonus(user: UserProfile): UserProfile {
+  const today = getTodayDateString();
+  if (normalizeDateString(user.lastLoginBonusDate || '') === today) return user;
+
+  const previousActiveDate = normalizeDateString(user.lastActiveDate || '');
+  const nextStreak = previousActiveDate === getYesterdayDateString() ? user.streakDays + 1 : 1;
+  const nextXp = user.xp + DAILY_LOGIN_XP;
+  const { level } = getLevelForXp(nextXp);
+
+  return {
+    ...user,
+    xp: nextXp,
+    level,
+    streakDays: nextStreak,
+    lastActiveDate: today,
+    lastLoginBonusDate: today,
+    socialCoins: (user.socialCoins || 0) + DAILY_LOGIN_COINS,
+  };
+}
+
 export function isSpotUsedToday(spotId: string, user: UserProfile): boolean {
   const todayPrefix = getTodayDateString();
   
@@ -390,7 +423,7 @@ export function loadUserProfile(): UserProfile {
     if (saved) {
       const parsed = JSON.parse(saved);
       // Ensure all arrays and nested objects exist
-      return {
+      return applyDailyLoginBonus({
         ...INITIAL_USER,
         ...parsed,
         avatar: { ...INITIAL_USER.avatar, ...(parsed.avatar || {}) },
@@ -400,12 +433,12 @@ export function loadUserProfile(): UserProfile {
         missions: parsed.missions || INITIAL_USER.missions,
         achievements: parsed.achievements || INITIAL_USER.achievements,
         verifications: parsed.verifications || INITIAL_USER.verifications || [],
-      };
+      });
     }
   } catch (e) {
     console.error('Error loading user profile from storage', e);
   }
-  return INITIAL_USER;
+  return applyDailyLoginBonus({ ...INITIAL_USER });
 }
 
 export function saveUserProfile(user: UserProfile): void {

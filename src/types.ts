@@ -178,6 +178,7 @@ export interface UserProfile {
   xp: number;
   streakDays: number;
   lastActiveDate: string;
+  lastLoginBonusDate?: string;
   avatar: AvatarConfig;
   unlockedItemIds: string[];
   equippedItems: AvatarConfig;
