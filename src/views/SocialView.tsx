@@ -38,7 +38,7 @@ export const SocialView: React.FC<SocialViewProps> = ({
   const [activeCategory, setActiveCategory] = useState<CategoryType>('environment');
   const [viewTab, setViewTab] = useState<'map' | 'activities' | 'spots'>('map');
 
-  const categoryList: CategoryType[] = ['environment', 'support', 'community', 'volunteer', 'learning'];
+  const categoryList: CategoryType[] = ['environment', 'support', 'learning'];
   const filteredActivities = ACTIVITIES.filter((a) => a.category === activeCategory);
   const currentCatInfo = CATEGORIES[activeCategory];
 
@@ -180,10 +180,10 @@ export const SocialView: React.FC<SocialViewProps> = ({
                   社会貢献カテゴリを選択
                 </h3>
               </div>
-              <span className="text-xs text-slate-400 font-pixel">全5ジャンル</span>
+              <span className="text-xs text-slate-400 font-pixel">全3ジャンル</span>
             </div>
 
-            <div className="grid grid-cols-5 gap-1.5 p-1.5 bg-slate-900/90 rounded-2xl pixel-box">
+            <div className="grid grid-cols-3 gap-1.5 p-1.5 bg-slate-900/90 rounded-2xl pixel-box">
               {categoryList.map((catKey) => {
                 const cat = CATEGORIES[catKey];
                 const isSelected = activeCategory === catKey;

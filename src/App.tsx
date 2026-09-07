@@ -32,6 +32,7 @@ import { HomeView } from './views/HomeView';
 import { QuestView } from './views/QuestView';
 import { SocialView } from './views/SocialView';
 import { AvatarView } from './views/AvatarView';
+import { BattleView } from './views/BattleView';
 import { ProfileView } from './views/ProfileView';
 import { ContributionModal } from './components/ContributionModal';
 import { LevelUpModal } from './components/LevelUpModal';
@@ -218,7 +219,7 @@ export default function App() {
         currentLevelTarget: curTarget,
         co2SavedKg: prev.co2SavedKg + (data.category === 'environment' ? 1.2 : 0.3),
         donationsTotalYen: prev.donationsTotalYen + (data.category === 'support' ? 500 : 0),
-        volunteerHours: prev.volunteerHours + (data.category === 'volunteer' ? 1 : 0),
+        learningActionsCount: (prev.learningActionsCount || 0) + (data.category === 'learning' ? 1 : 0),
       };
     });
   };
@@ -481,7 +482,7 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full max-w-6xl mx-auto px-3 sm:px-6 pt-4 pb-24">
+      <main className="flex-1 w-full max-w-6xl mx-auto px-3.5 sm:px-6 pt-4 sm:pt-6 pb-24">
         {currentTab === 'home' && (
           <HomeView
             user={user}
@@ -492,6 +493,7 @@ export default function App() {
             onOpenWorldTree={() => setIsWorldTreeOpen(true)}
             onOpenWorldMap={() => setCurrentTab('social')}
             onOpenQRScanner={() => handleOpenQRScanner()}
+            onOpenBattleView={() => setCurrentTab('battle')}
           />
         )}
 
@@ -501,6 +503,32 @@ export default function App() {
             onClaimMission={handleClaimMission}
             onOpenContributionModal={(cat) => handleOpenContribution(cat)}
             onOpenQRScanner={() => handleOpenQRScanner()}
+          />
+        )}
+
+        {currentTab === 'battle' && (
+          <BattleView
+            user={user}
+            onUpdateUser={setUser}
+            onUnlockItem={(item) => {
+              setUser((prev) => ({
+                ...prev,
+                unlockedItems: Array.from(new Set([...prev.unlockedItems, item.id])),
+              }));
+            }}
+            onEquipItem={(category, itemId) => {
+              setUser((prev) => {
+                const currentAvatar = { ...prev.avatar };
+                if (category === 'weapon') currentAvatar.weapon = itemId;
+                else if (category === 'hat') currentAvatar.hat = itemId;
+                else if (category === 'clothes') currentAvatar.clothes = itemId;
+                else if (category === 'pet') currentAvatar.pet = itemId;
+                else if (category === 'back') currentAvatar.back = itemId;
+                else if (category === 'special') currentAvatar.special = itemId;
+                else if (category === 'background') currentAvatar.background = itemId;
+                return { ...prev, avatar: currentAvatar };
+              });
+            }}
           />
         )}
 

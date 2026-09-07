@@ -1,12 +1,12 @@
-export type CategoryType = 'environment' | 'support' | 'community' | 'volunteer' | 'learning';
+export type CategoryType = 'environment' | 'support' | 'learning';
 
 export type ContributionTypeId = 
   | 'ecologist'       // 環境系多め
   | 'supporter'       // 支援系多め
-  | 'communityMaker'  // 地域系多め
-  | 'volunteerHero'   // ボランティア多め
   | 'socialLearner'   // 学習・啓発多め
-  | 'allRounder';     // バランス型
+  | 'allRounder'      // バランス型
+  | 'communityMaker'  // 互換性保持
+  | 'volunteerHero';  // 互換性保持
 
 export interface CategoryInfo {
   id: CategoryType;
@@ -185,6 +185,114 @@ export interface UserProfile {
   missions: Mission[];
   achievements: Achievement[];
   verifications?: Verification[];
+  socialCoins?: number;
+  battleRecords?: {
+    defeatedCount: number;
+    purifiedCount: number;
+    monstersDefeated: Record<string, number>;
+    monstersPurified: Record<string, number>;
+    clearedStages: string[];
+  };
+}
+
+// ==========================================
+// BATTLE & MONSTER SYSTEM TYPES
+// ==========================================
+export type MonsterWeakness = CategoryType;
+
+export interface MonsterMove {
+  id: string;
+  name: string;
+  power: number;
+  dialogue?: string;
+  description: string;
+  effectType?: 'damage' | 'pollution' | 'debuff';
+}
+
+export interface BattleDropItem {
+  itemId: string;
+  name: string;
+  rarity: ItemRarity;
+  icon: string;
+  category: AvatarCategory;
+  dropRate: number; // 0.0 to 1.0
+  description: string;
+  isExclusiveEquipment?: boolean;
+}
+
+export interface Monster {
+  id: string;
+  name: string;
+  title: string;
+  subtitle: string;
+  level: number;
+  category: CategoryType | 'all';
+  weaknesses: MonsterWeakness[];
+  maxHp: number;
+  attack: number;
+  defense: number;
+  speed: number;
+  purifyThreshold: number; // e.g. 50 means purify succeeds when enemy HP <= 50%
+  icon: string;
+  pixelArtType: string;
+  themeColor: string;
+  bgGradient: string;
+  habitat: string;
+  lore: string;
+  introQuote: string;
+  defeatQuote: string;
+  purifiedQuote: string;
+  moves: MonsterMove[];
+  rewards: {
+    xp: number;
+    coins: number;
+    dropItems: BattleDropItem[];
+  };
+}
+
+export interface SocialSkill {
+  id: string;
+  name: string;
+  category: CategoryType | 'all';
+  spCost: number;
+  power: number;
+  type: 'attack' | 'heal' | 'buff' | 'purify';
+  icon: string;
+  description: string;
+  soundType: 'attack' | 'heal' | 'buff' | 'fanfare';
+}
+
+export interface BattleConsumableItem {
+  id: string;
+  name: string;
+  icon: string;
+  count: number;
+  effectType: 'heal_hp' | 'heal_sp' | 'debuff_enemy' | 'purify_boost';
+  value: number;
+  description: string;
+}
+
+export interface BattleLogEntry {
+  id: string;
+  turn: number;
+  actor?: 'player' | 'monster' | 'pet' | 'system';
+  message: string;
+  type?: 'damage' | 'heal' | 'crit' | 'weakness' | 'purify' | 'info' | 'player' | 'monster' | 'dialogue';
+}
+
+export interface BattleRewardResult {
+  monsterName?: string;
+  wasPurified?: boolean;
+  xpGained?: number;
+  coinsGained?: number;
+  droppedItems: AvatarItem[];
+  won?: boolean;
+  purified?: boolean;
+  xpEarned?: number;
+  coinsEarned?: number;
+  previousLevel?: number;
+  newLevel?: number;
+  unlockedNewEquipment?: boolean;
 }
 
 export interface WorldArea {
@@ -211,6 +319,7 @@ export interface GlobalWorldStats {
   activeExplorers: number;
   co2SavedKg: number;
   donationsTotalYen: number;
-  volunteerHours: number;
+  learningActionsCount?: number;
+  volunteerHours?: number;
   areas?: Record<string, WorldArea>;
 }
