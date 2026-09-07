@@ -1,12 +1,12 @@
-export type CategoryType = 'environment' | 'support' | 'community' | 'volunteer' | 'learning';
+export type CategoryType = 'environment' | 'support' | 'learning';
 
 export type ContributionTypeId = 
   | 'ecologist'       // 環境系多め
   | 'supporter'       // 支援系多め
-  | 'communityMaker'  // 地域系多め
-  | 'volunteerHero'   // ボランティア多め
   | 'socialLearner'   // 学習・啓発多め
-  | 'allRounder';     // バランス型
+  | 'allRounder'      // バランス型
+  | 'communityMaker'  // 互換性保持
+  | 'volunteerHero';  // 互換性保持
 
 export interface CategoryInfo {
   id: CategoryType;
@@ -319,6 +319,7 @@ export interface GlobalWorldStats {
   activeExplorers: number;
   co2SavedKg: number;
   donationsTotalYen: number;
-  volunteerHours: number;
+  learningActionsCount?: number;
+  volunteerHours?: number;
   areas?: Record<string, WorldArea>;
 }

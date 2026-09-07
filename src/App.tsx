@@ -219,7 +219,7 @@ export default function App() {
         currentLevelTarget: curTarget,
         co2SavedKg: prev.co2SavedKg + (data.category === 'environment' ? 1.2 : 0.3),
         donationsTotalYen: prev.donationsTotalYen + (data.category === 'support' ? 500 : 0),
-        volunteerHours: prev.volunteerHours + (data.category === 'volunteer' ? 1 : 0),
+        learningActionsCount: (prev.learningActionsCount || 0) + (data.category === 'learning' ? 1 : 0),
       };
     });
   };
@@ -482,7 +482,7 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full max-w-6xl mx-auto px-2.5 sm:px-6 pt-3 sm:pt-4 pb-20 sm:pb-24">
+      <main className="flex-1 w-full max-w-6xl mx-auto px-3.5 sm:px-6 pt-4 sm:pt-6 pb-24">
         {currentTab === 'home' && (
           <HomeView
             user={user}

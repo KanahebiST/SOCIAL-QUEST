@@ -269,7 +269,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
         setDefenseBuffTurns(3);
         audio.playMagic();
         triggerFloatText(`DEF UP!`, 'text-cyan-400', false);
-        addLog(`🏙️ ${skill.name}を発動！地域の絆で3ターンの間受けるダメージが半減する！`, 'player');
+        addLog(`🛡️ ${skill.name}を発動！助け合いの絆で3ターンの間受けるダメージが半減する！`, 'player');
 
         setIsPlayerTurn(false);
         setTimeout(() => executeMonsterTurn(monsterHp), 900);
@@ -657,7 +657,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
                       <div className="truncate">
                         <span className="text-slate-500">弱点:</span>{' '}
                         <span className="font-bold text-emerald-300">
-                          {mon.weaknesses.map((w) => (w === 'environment' ? '環境' : w === 'support' ? '福祉' : w === 'community' ? '地域' : w === 'volunteer' ? '奉仕' : '学習')).join('/')}
+                          {mon.weaknesses.map((w) => (w === 'environment' ? '環境' : w === 'support' ? '支援' : '学習')).join('/')}
                         </span>
                       </div>
                     </div>
