@@ -1043,6 +1043,9 @@ export const INITIAL_USER: UserProfile = {
   title: '🌱 エコロジスト',
   level: 5,
   xp: 520, // Level 5 (Range 500 to 800)
+  currentXp: 0,
+nextLevelXp: 100,
+unlockedItems: [],
   streakDays: 4,
   lastActiveDate: '2026-08-24',
   avatar: {

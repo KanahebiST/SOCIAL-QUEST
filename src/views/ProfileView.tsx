@@ -26,7 +26,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
   const typeResult = evaluateContributionType(user.contributions);
   const verifiedCount = getVerifiedRecycleCount(user);
-  const manualCount = user.contributions.length - user.contributions.filter(c => c.verificationType === 'qr_scan' || c.verificationType === 'qr').length;
+  const manualCount = user.contributions.length - user.contributions.filter(c => c.verificationType === 'qr').length;
 
   // Filter history
   const filteredHistory = user.contributions.filter((c) => {
@@ -34,9 +34,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     if (activeHistoryFilter === 'all') {
       matchesCategory = true;
     } else if (activeHistoryFilter === 'verified') {
-      matchesCategory = c.verificationType === 'qr_scan' || c.verificationType === 'qr';
+      matchesCategory = c.verificationType === 'qr';
     } else if (activeHistoryFilter === 'manual') {
-      matchesCategory = c.verificationType !== 'qr_scan' && c.verificationType !== 'qr';
+      matchesCategory = c.verificationType !== 'qr';
     } else {
       matchesCategory = c.category === activeHistoryFilter;
     }
@@ -437,7 +437,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 }`}
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
-                <span>QR実機認証 ({user.contributions.filter(c => c.verificationType === 'qr_scan' || c.verificationType === 'qr').length})</span>
+                <span>QR実機認証 ({user.contributions.filter(c =>c.verificationType === 'qr').length})</span>
               </button>
 
               <button
@@ -457,7 +457,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {filteredHistory.length > 0 ? (
               filteredHistory.map((c) => {
-                const isQR = c.verificationType === 'qr_scan' || c.verificationType === 'qr';
+                const isQR = c.verificationType === 'qr';
 
                 return (
                   <div
