@@ -8,6 +8,12 @@ import {
   BattleRewardResult,
   AvatarItem,
 } from '../types';
+import coastStageBg from '../assets/backgrounds/coast-stage.png';
+import smogStageBg from '../assets/backgrounds/smog-stage.png';
+import backyardStageBg from '../assets/backgrounds/backyard-stage.png';
+import cyberStageBg from '../assets/backgrounds/cyber-stage.png';
+import bossStageBg from '../assets/backgrounds/boss-stage.png';
+import worldMapBg from '../assets/backgrounds/world-map.png';
 import { MONSTERS, SOCIAL_SKILLS, DEFAULT_BATTLE_ITEMS } from '../data/monsters';
 import { ITEM_MAP, RARITY_CONFIG } from '../data/items';
 import { AvatarDisplay } from '../components/AvatarDisplay';
@@ -39,7 +45,13 @@ interface BattleViewProps {
   onUnlockItem?: (item: AvatarItem) => void;
   onEquipItem?: (category: string, itemId: string) => void;
 }
-
+const weaknessLabels: Record<string, string> = {
+  environment: '🌿 環境',
+  support: '🤝 支援',
+  community: '🏘️ 地域',
+  volunteer: '❤️ ボランティア',
+  learning: '📚 学習',
+};
 export const BattleView: React.FC<BattleViewProps> = ({
   user,
   onUpdateUser,
@@ -49,8 +61,9 @@ export const BattleView: React.FC<BattleViewProps> = ({
   // Stage selection vs In-Battle state
   const [selectedMonster, setSelectedMonster] = useState<Monster | null>(null);
   const [inBattle, setInBattle] = useState<boolean>(false);
-
-  // Combat state
+const [stagePreview, setStagePreview] = useState<Monster | null>(null);
+const [showBossWarning, setShowBossWarning] = useState(false); 
+// Combat state
   const [playerHp, setPlayerHp] = useState<number>(100);
   const [playerMaxHp, setPlayerMaxHp] = useState<number>(100);
   const [playerSp, setPlayerSp] = useState<number>(50);
@@ -275,7 +288,9 @@ export const BattleView: React.FC<BattleViewProps> = ({
         setTimeout(() => executeMonsterTurn(monsterHp), 900);
       } else if (skill.type === 'purify') {
         // Universal cleanse skill
-        const isWeak = selectedMonster.weaknesses.includes(skill.category) || skill.category === 'all';
+       const isWeak =
+  skill.category === 'all' ||
+  selectedMonster.weaknesses.includes(skill.category);
         const damage = skill.power + (isWeak ? 25 : 0);
         const newMonsterHp = Math.max(0, monsterHp - damage);
         setMonsterHp(newMonsterHp);
@@ -296,7 +311,9 @@ export const BattleView: React.FC<BattleViewProps> = ({
         }, 500);
       } else {
         // Offensive skill
-        const isWeak = selectedMonster.weaknesses.includes(skill.category) || skill.category === 'all';
+        const isWeak =
+  skill.category === 'all' ||
+  selectedMonster.weaknesses.includes(skill.category);
         let damage = skill.power + playerStats.atk - selectedMonster.defense;
         if (isWeak) damage = Math.floor(damage * 1.5);
         damage = Math.max(12, damage);
@@ -502,9 +519,15 @@ export const BattleView: React.FC<BattleViewProps> = ({
 
     // Update User Profile State with XP, Coins, and battleRecords
     const currentCoins = user.socialCoins || 0;
-    const currentDefeated = user.battleRecords?.monstersDefeated || 0;
-    const currentPurified = user.battleRecords?.monstersPurified || 0;
-    const clearedStages = user.battleRecords?.clearedStages || [];
+const currentBattleRecords = user.battleRecords ?? {
+  defeatedCount: 0,
+  purifiedCount: 0,
+  monstersDefeated: {},
+  monstersPurified: {},
+  clearedStages: [],
+};
+
+const clearedStages = currentBattleRecords.clearedStages;
 
     const updatedCleared = clearedStages.includes(selectedMonster.id)
       ? clearedStages
@@ -536,23 +559,56 @@ export const BattleView: React.FC<BattleViewProps> = ({
       unlockedItems: Array.from(
         new Set([...user.unlockedItems, ...dropsEarned.map((d) => d.id)])
       ),
-      battleRecords: {
-        monstersDefeated: currentDefeated + (wasPurified ? 0 : 1),
-        monstersPurified: currentPurified + (wasPurified ? 1 : 0),
-        clearedStages: updatedCleared,
+     battleRecords: {
+  defeatedCount:
+    currentBattleRecords.defeatedCount + (wasPurified ? 0 : 1),
+
+  purifiedCount:
+    currentBattleRecords.purifiedCount + (wasPurified ? 1 : 0),
+
+  monstersDefeated: wasPurified
+    ? currentBattleRecords.monstersDefeated
+    : {
+        ...currentBattleRecords.monstersDefeated,
+        [selectedMonster.id]:
+          (currentBattleRecords.monstersDefeated[selectedMonster.id] || 0) + 1,
       },
+
+  monstersPurified: wasPurified
+    ? {
+        ...currentBattleRecords.monstersPurified,
+        [selectedMonster.id]:
+          (currentBattleRecords.monstersPurified[selectedMonster.id] || 0) + 1,
+      }
+    : currentBattleRecords.monstersPurified,
+
+  clearedStages: updatedCleared,
+},
     };
 
     onUpdateUser(updatedUser);
+if (wasPurified) {
+  addLog(
+    'Purified: ' + selectedMonster.name,
+    'purify'
+  );
 
-    if (wasPurified) {
-      addLog(`✨ ${selectedMonster.name}を浄化し、平和的に和解した！`, 'purify');
-      addLog(`💬 ${selectedMonster.name}: 「${selectedMonster.purifiedQuote}」`, 'dialogue');
-    } else {
-      addLog(`🎉 ${selectedMonster.name}を討伐した！街に平和が戻った！`, 'crit');
-      addLog(`💬 ${selectedMonster.name}: 「${selectedMonster.defeatQuote}」`, 'dialogue');
-    }
-  };
+  addLog(
+    selectedMonster.name + ': ' + selectedMonster.purifiedQuote,
+    'dialogue'
+  );
+} else {
+  addLog(
+    'Defeated: ' + selectedMonster.name,
+    'crit'
+  );
+
+  addLog(
+    selectedMonster.name + ': ' + selectedMonster.defeatQuote,
+    'dialogue'
+  );
+}
+}
 
   // Exit battle and return to Stage Select
   const handleExitBattle = () => {
@@ -561,148 +617,258 @@ export const BattleView: React.FC<BattleViewProps> = ({
     setBattleResult(null);
     setIsDefeatedModal(false);
   };
+const previewStageIndex = stagePreview
+  ? MONSTERS.findIndex((mon) => mon.id === stagePreview.id)
+  : -1;
 
+const isPreviewBoss =
+  stagePreview !== null &&
+  previewStageIndex === MONSTERS.length - 1;
+
+const isPreviewCleared =
+  stagePreview !== null &&
+  (user.battleRecords?.clearedStages?.includes(stagePreview.id) ?? false);
+  const mapClearedStages = user.battleRecords?.clearedStages ?? [];
+
+const nextMapMonster =
+  MONSTERS.find((mon, index) => {
+    if (mapClearedStages.includes(mon.id)) return false;
+
+    return (
+      index === 0 ||
+      mapClearedStages.includes(MONSTERS[index - 1].id)
+    );
+  }) ?? MONSTERS[0];
+
+const activeMapMonster = stagePreview ?? nextMapMonster;
+const activeMapTheme = activeMapMonster.mapTheme;
+  
+const STAGE_BACKDROPS: Record<string, string> = {
+  mon_plastic_slime: coastStageBg,
+  mon_smog_ghost: smogStageBg,
+  mon_food_loss_demon: backyardStageBg,
+  mon_fake_news_golem: cyberStageBg,
+  mon_carbon_titan: bossStageBg,
+};
   return (
-    <div id="battle-view-container" className="space-y-6">
-      {/* ============================================================ */}
-      {/* STAGE SELECT SCREEN (バトル前のステージ選択画面) */}
-      {/* ============================================================ */}
+    <div
+      id="battle-view-container"
+      className="space-y-6 pb-24 sm:pb-28"
+    >
       {!inBattle && (
-        <div className="space-y-4 sm:space-y-6">
-          {/* Header Banner */}
-          <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-4 sm:p-6 rounded-2xl border border-indigo-500/30 shadow-xl relative overflow-hidden">
-            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
-              <div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[11px] sm:text-xs font-bold border border-indigo-400/30 mb-1.5">
-                  <Swords className="w-3.5 h-3.5" /> レトロRPGコマンドバトル
-                </div>
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-wide">
-                  社会課題モンスター討伐・浄化クエスト
-                </h2>
-                <p className="text-xs sm:text-sm text-indigo-200/80 mt-1 max-w-2xl leading-relaxed">
-                  現実の社会貢献活動で培ったソーシャルパワーと装備で、街にはびこる環境汚染や社会課題の化身たちに立ち向かおう！
-                </p>
-              </div>
+        <>
+          <div className="space-y-4 sm:space-y-6 pt-4">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[11px] sm:text-xs font-bold border border-indigo-400/30 mb-1.5">
+              <Swords className="w-3.5 h-3.5" /> レトロRPGコマンドバトル
+            </div>
 
-              {/* User Battle Stats & Social Coins */}
-              <div className="grid grid-cols-3 sm:flex items-center gap-1.5 sm:gap-3 bg-slate-950/70 p-2 sm:p-3 rounded-xl border border-indigo-500/30 text-center">
-                <div className="px-1.5 sm:px-3 sm:border-r border-slate-800">
-                  <div className="text-[10px] sm:text-xs text-slate-400 font-bold">コイン</div>
-                  <div className="text-sm sm:text-lg font-black text-amber-400">🪙 {user.socialCoins || 0}</div>
-                </div>
-                <div className="px-1.5 sm:px-3 sm:border-r border-slate-800">
-                  <div className="text-[10px] sm:text-xs text-slate-400 font-bold">浄化数</div>
-                  <div className="text-sm sm:text-lg font-black text-emerald-400">✨ {user.battleRecords?.monstersPurified || 0}</div>
-                </div>
-                <div className="px-1.5 sm:px-3">
-                  <div className="text-[10px] sm:text-xs text-slate-400 font-bold">討伐数</div>
-                  <div className="text-sm sm:text-lg font-black text-rose-400">⚔️ {user.battleRecords?.monstersDefeated || 0}</div>
-                </div>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-wide">
+              社会課題モンスター討伐・浄化クエスト
+            </h2>
+
+            <p className="text-xs sm:text-sm text-indigo-200/80 mt-1 max-w-2xl leading-relaxed">
+              現実の社会貢献活動で培ったソーシャルパワーと装備で、街にはびこる環境汚染や社会課題の化身たちに立ち向かおう！
+            </p>
+
+            <div className="grid grid-cols-3 sm:flex items-center gap-1.5 sm:gap-3 bg-slate-950/70 p-2 sm:p-3 rounded-xl border border-indigo-500/30 text-center">
+              <div className="px-1.5 sm:px-3 sm:border-r border-slate-800">
+                <div className="text-[10px] sm:text-xs text-slate-400 font-bold">コイン</div>
+                <div className="text-sm sm:text-lg font-black text-amber-400">🪙 {user.socialCoins || 0}</div>
+              </div>
+              <div className="px-1.5 sm:px-3 sm:border-r border-slate-800">
+                <div className="text-[10px] sm:text-xs text-slate-400 font-bold">浄化数</div>
+                <div className="text-sm sm:text-lg font-black text-emerald-400">✨ {user.battleRecords?.purifiedCount || 0}</div>
+              </div>
+              <div className="px-1.5 sm:px-3">
+                <div className="text-[10px] sm:text-xs text-slate-400 font-bold">討伐数</div>
+                <div className="text-sm sm:text-lg font-black text-rose-400">⚔️ {user.battleRecords?.defeatedCount || 0}</div>
               </div>
             </div>
           </div>
 
-          {/* Monster Stage List */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-            {MONSTERS.map((mon, index) => {
-              const isCleared = user.battleRecords?.clearedStages?.includes(mon.id);
-              return (
-                <div
-                  key={mon.id}
-                  id={`stage-card-${mon.id}`}
-                  className="bg-slate-900/90 border border-slate-700/80 hover:border-indigo-400/60 transition-all rounded-2xl p-3.5 sm:p-5 flex flex-col justify-between shadow-lg hover:shadow-indigo-950/50"
-                >
-                  <div>
-                    {/* Top Stage Header */}
-                    <div className="flex items-center justify-between mb-2 sm:mb-3">
-                      <div className="flex items-center gap-1.5 sm:gap-2">
-                        <span className="text-[10px] sm:text-xs font-black px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-700">
-                          {mon.subtitle}
-                        </span>
-                        {isCleared && (
-                          <span className="text-[10px] sm:text-xs font-bold px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-700 flex items-center gap-1">
-                            <Award className="w-3 h-3" /> CLEAR
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-[11px] sm:text-xs font-bold text-slate-400">推奨Lv.{mon.level}</span>
-                    </div>
+          <div className="relative overflow-hidden rounded-3xl border border-indigo-500/30 bg-slate-950 shadow-2xl">
+            <div
+              className={`absolute inset-0 ${
+                activeMapTheme === 'coast'
+                  ? 'bg-gradient-to-b from-sky-700 via-cyan-900 to-emerald-950'
+                  : activeMapTheme === 'smog'
+                  ? 'bg-gradient-to-b from-slate-600 via-zinc-800 to-slate-950'
+                  : activeMapTheme === 'backyard'
+                  ? 'bg-gradient-to-b from-amber-950 via-emerald-950 to-slate-950'
+                  : activeMapTheme === 'cyber'
+                  ? 'bg-gradient-to-b from-fuchsia-950 via-indigo-950 to-slate-950'
+                  : activeMapTheme === 'boss'
+                  ? 'bg-gradient-to-b from-orange-900 via-rose-950 to-slate-950'
+                  : 'bg-gradient-to-b from-indigo-950 via-slate-950 to-cyan-950'
+              }`}
+            />
 
-                    {/* Monster Visual & Info */}
-                    <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
-                      <div className="w-20 h-20 sm:w-24 sm:h-24 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-center p-1 relative overflow-hidden flex-shrink-0">
-                        <div className={`absolute inset-0 bg-gradient-to-b ${mon.bgGradient} opacity-40`} />
-                        <MonsterPixelArt type={mon.pixelArtType} size={70} />
-                      </div>
-
-                      <div className="space-y-0.5 sm:space-y-1 min-w-0">
-                        <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-1.5 truncate">
-                          <span>{mon.icon}</span> {mon.name}
-                        </h3>
-                        <p className="text-xs text-indigo-300 font-medium truncate">{mon.title}</p>
-                        <p className="text-[11px] sm:text-xs text-slate-400 line-clamp-2 leading-tight">{mon.lore}</p>
-                      </div>
-                    </div>
-
-                    {/* Stats & Weakness Preview */}
-                    <div className="grid grid-cols-3 gap-1.5 sm:gap-2 bg-slate-950/60 p-2 sm:p-2.5 rounded-lg text-[11px] sm:text-xs mb-3 sm:mb-4">
-                      <div>
-                        <span className="text-slate-500">HP:</span>{' '}
-                        <span className="font-bold text-slate-200">{mon.maxHp}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-500">ATK:</span>{' '}
-                        <span className="font-bold text-rose-300">{mon.attack}</span>
-                      </div>
-                      <div className="truncate">
-                        <span className="text-slate-500">弱点:</span>{' '}
-                        <span className="font-bold text-emerald-300">
-                          {mon.weaknesses.map((w) => (w === 'environment' ? '環境' : w === 'support' ? '福祉' : w === 'community' ? '地域' : w === 'volunteer' ? '奉仕' : '学習')).join('/')}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Drop Items Preview */}
-                    <div className="mb-3 sm:mb-4">
-                      <div className="text-[11px] sm:text-xs text-slate-400 mb-1 flex items-center gap-1">
-                        <Gift className="w-3.5 h-3.5 text-amber-400" /> レアドロップ報酬:
-                      </div>
-                      <div className="flex flex-wrap gap-1 sm:gap-1.5">
-                        {mon.rewards.dropItems.map((drop) => {
-                          const rCfg = RARITY_CONFIG[drop.rarity];
-                          return (
-                            <div
-                              key={drop.itemId}
-                              className={`text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md border flex items-center gap-1 ${rCfg.frameBg} ${rCfg.border}`}
-                            >
-                              <span>{drop.icon}</span>
-                              <span className={`font-medium ${rCfg.textColor}`}>{drop.name}</span>
-                              <span className="text-[9px] sm:text-[10px] text-slate-400">({Math.round(drop.dropRate * 100)}%)</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              {activeMapTheme === 'smog' && (
+                <>
+                  <div className="absolute inset-x-0 top-0 h-[38%] bg-gradient-to-b from-slate-500/40 to-slate-800/10" />
+                  <div className="absolute left-[4%] top-[14%] h-40 w-20 bg-slate-950/35 rounded-t-sm" />
+                  <div className="absolute left-[17%] top-[19%] h-32 w-14 bg-slate-950/30 rounded-t-sm" />
+                  <div className="absolute right-[8%] top-[12%] h-44 w-24 bg-slate-950/35 rounded-t-sm" />
+                  <div className="absolute right-[25%] top-[20%] h-28 w-16 bg-slate-950/25 rounded-t-sm" />
+                  <div className="absolute left-[-10%] right-[-10%] top-[27%] h-16 bg-slate-950/80 -rotate-2 shadow-2xl">
+                    <div className="absolute inset-x-0 top-2 h-1 bg-slate-500/30" />
+                    <div className="absolute inset-x-0 bottom-2 h-1 bg-slate-700/50" />
                   </div>
+                  <div className="absolute left-[18%] top-[28%] h-[30%] w-10 bg-slate-900/70" />
+                  <div className="absolute right-[18%] top-[27%] h-[34%] w-12 bg-slate-900/70" />
+                  <div className="absolute inset-x-0 bottom-0 h-[32%] bg-gradient-to-b from-zinc-900/20 to-zinc-950/80" />
+                  <div className="absolute bottom-[15%] left-[15%] right-[15%] h-1 bg-slate-300/10 -rotate-3" />
+                  <div className="absolute left-[-10%] top-[18%] h-40 w-[70%] rounded-full bg-slate-300/10 blur-3xl" />
+                  <div className="absolute right-[-15%] top-[38%] h-52 w-[75%] rounded-full bg-zinc-300/10 blur-3xl" />
+                  <div className="absolute left-[5%] bottom-[20%] h-48 w-[90%] rounded-full bg-slate-400/5 blur-3xl" />
+                  <div className="absolute left-[11%] top-[44%] h-48 w-24 bg-amber-300/5 blur-3xl" />
+                  <div className="absolute right-[10%] top-[50%] h-40 w-20 bg-amber-300/5 blur-3xl" />
+                </>
+              )}
 
-                  {/* Battle Start Button */}
-                  <button
-                    id={`btn-start-battle-${mon.id}`}
-                    onClick={() => handleStartBattle(mon)}
-                    className="w-full py-2.5 sm:py-3 px-3 sm:px-4 rounded-xl font-black text-xs sm:text-sm tracking-wide bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white shadow-lg flex items-center justify-center gap-2 transition-all active:scale-95"
-                  >
-                    <Swords className="w-4 h-4" /> このステージに挑む
-                  </button>
-                </div>
-              );
-            })}
+              {activeMapTheme === 'coast' && (
+                <>
+                  <div className="absolute inset-x-0 top-0 h-[40%] bg-gradient-to-b from-sky-500/50 via-sky-700/30 to-cyan-900/20" />
+                  <div className="absolute inset-x-0 top-[30%] h-[34%] bg-gradient-to-b from-cyan-600/50 via-blue-800/50 to-cyan-950/70" />
+                  <div className="absolute left-0 right-0 top-[30%] h-[2px] bg-cyan-200/30" />
+                  <div className="absolute left-[15%] right-[20%] top-[37%] h-12 bg-cyan-200/10 blur-2xl" />
+                  <div className="absolute left-[-5%] right-[-5%] top-[55%] h-3 rounded-full bg-cyan-200/20 blur-[2px]" />
+                  <div className="absolute left-[10%] right-[-10%] top-[59%] h-2 rounded-full bg-white/15 blur-[1px]" />
+                  <div className="absolute inset-x-0 bottom-0 h-[43%] bg-gradient-to-b from-amber-800/35 via-amber-950/40 to-slate-950/80" />
+                  <div className="absolute inset-x-0 top-[61%] h-10 bg-gradient-to-b from-cyan-200/15 to-transparent blur-sm" />
+                  <div className="absolute left-[15%] bottom-[18%] rotate-12">
+                    <div className="h-3 w-10 rounded-full border border-cyan-300/40 bg-cyan-500/20" />
+                    <div className="ml-8 h-2 w-2 rounded-sm bg-cyan-300/30" />
+                  </div>
+                  <div className="absolute right-[19%] bottom-[27%] -rotate-12">
+                    <div className="h-5 w-3 rounded-sm border border-slate-300/30 bg-slate-500/25" />
+                  </div>
+                  <div className="absolute left-[33%] bottom-[10%] h-8 w-10 rotate-6 rounded-xl border border-white/15 bg-white/5" />
+                  <div className="absolute right-[35%] bottom-[14%] h-2 w-6 rotate-12 rounded-full bg-rose-400/20" />
+                  <div className="absolute left-[55%] bottom-[31%] h-2 w-4 -rotate-6 rounded-full bg-amber-300/20" />
+                  <div className="absolute left-[-15%] top-[25%] h-80 w-[70%] rounded-full bg-cyan-400/10 blur-3xl" />
+                </>
+              )}
+            </div>
+
+            <div className="absolute top-10 left-10 w-24 h-24 rounded-full bg-indigo-500/10 blur-3xl" />
+            <div className="absolute bottom-20 right-10 w-32 h-32 rounded-full bg-cyan-500/10 blur-3xl" />
+
+            <div className="relative z-10 max-w-xl mx-auto px-4 sm:px-8 pt-20 pb-28">
+              <div className="text-center mb-8">
+                <div className="text-xs font-black tracking-[0.25em] text-cyan-300">SOCIAL QUEST WORLD</div>
+                <h3 className="text-xl sm:text-2xl font-black text-white mt-1">社会課題モンスターマップ</h3>
+                <p className="text-xs text-slate-400 mt-2">ステージをクリアして次の敵へ進もう</p>
+              </div>
+
+              <div className="absolute inset-x-0 top-28 bottom-20 pointer-events-none z-20">
+                <svg viewBox="0 0 400 1000" preserveAspectRatio="none" className="w-full h-full">
+                  <defs>
+                    <linearGradient id="questPath" x1="0" y1="1" x2="0" y2="0">
+                      <stop offset="0%" stopColor="#22d3ee" />
+                      <stop offset="50%" stopColor="#6366f1" />
+                      <stop offset="100%" stopColor="#a855f7" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M 110 950 C 110 850, 300 850, 300 750 C 300 650, 100 650, 100 550 C 100 450, 300 450, 300 350 C 300 250, 110 250, 110 120" fill="none" stroke="url(#questPath)" strokeWidth="6" strokeLinecap="round" opacity="0.38" />
+                  <path d="M 110 950 C 110 850, 300 850, 300 750 C 300 650, 100 650, 100 550 C 100 450, 300 450, 300 350 C 300 250, 110 250, 110 120" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeDasharray="5 16" opacity="0.18" />
+                </svg>
+              </div>
+
+              <div className="relative space-y-0">
+                {[...MONSTERS].reverse().map((mon) => {
+                  const index = MONSTERS.findIndex((m) => m.id === mon.id);
+                  const stageBackdrop = STAGE_BACKDROPS[mon.id];
+                  const clearedStages = user.battleRecords?.clearedStages ?? [];
+                  const isCleared = clearedStages.includes(mon.id);
+                  const isUnlocked = index === 0 || clearedStages.includes(MONSTERS[index - 1].id);
+                  const isLeft = index % 2 === 0;
+                  const isBoss = index === MONSTERS.length - 1;
+                  const isNext = isUnlocked && !isCleared;
+
+                  return (
+                    <div key={mon.id} className={`relative flex min-h-[220px] items-center ${isLeft ? 'justify-start' : 'justify-end'}`}>
+                      {stageBackdrop && (
+                        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0 w-[calc(100%+12rem)] sm:w-[calc(100%+18rem)] md:w-[calc(100%+22rem)] max-w-[900px] h-72 sm:h-80 md:h-[26rem] overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl pointer-events-none">
+                          <img src={stageBackdrop} alt="" className={`absolute inset-0 w-full h-full object-cover ${mon.mapTheme === 'coast' ? 'object-[center_65%]' : 'object-center'}`} style={{ imageRendering: 'pixelated' }} />
+                          <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.18) 1px, transparent 1px)', backgroundSize: '8px 8px' }} />
+                          <div className={`absolute inset-0 ${mon.mapTheme === 'coast' ? 'bg-sky-950/10' : 'bg-slate-950/25'}`} />
+                          <div className="absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-slate-950/60 to-transparent" />
+                          <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-slate-950/60 to-transparent" />
+                        </div>
+                      )}
+
+                      <button
+                        id={`stage-map-${mon.id}`}
+                        disabled={!isUnlocked}
+                        onClick={() => {
+                          if (!isUnlocked) return;
+                          if (isBoss) {
+                            setShowBossWarning(true);
+                            setTimeout(() => {
+                              setShowBossWarning(false);
+                              setStagePreview(mon);
+                            }, 1300);
+                          } else {
+                            setStagePreview(mon);
+                          }
+                        }}
+                        className={`relative z-30 w-[130px] sm:w-[150px] flex flex-col items-center bg-transparent border-0 p-0 transition-all duration-200 ${!isUnlocked ? 'opacity-45 cursor-not-allowed' : 'hover:scale-105 active:scale-95'}`}
+                      >
+                        {isNext && (
+                          <div className="absolute -top-7 left-1/2 -translate-x-1/2 z-30">
+                            <div className="px-3 py-1 rounded-full bg-cyan-400 text-slate-950 text-[10px] font-black shadow-lg shadow-cyan-500/40 animate-pulse whitespace-nowrap">▶ NEXT</div>
+                          </div>
+                        )}
+
+                        {isNext && (
+                          <div className={`absolute top-14 z-30 ${isLeft ? '-right-5' : '-left-5'}`}>
+                            <div className="flex flex-col items-center">
+                              <div className="text-xl">🧍</div>
+                              <div className="px-1.5 py-0.5 rounded-full bg-slate-950 border border-cyan-400 text-cyan-300 text-[8px] font-black">YOU</div>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className={`mb-2 px-2.5 py-1 rounded-full text-[10px] font-black border ${isBoss ? 'bg-rose-950 text-rose-300 border-rose-500' : isCleared ? 'bg-emerald-950 text-emerald-300 border-emerald-500' : isUnlocked ? 'bg-indigo-950 text-indigo-300 border-indigo-500' : 'bg-slate-950 text-slate-500 border-slate-700'}`}>
+                          {isBoss ? '👑 FINAL BOSS' : `STAGE ${index + 1}`}
+                        </div>
+
+                        <div className={`relative w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center border-4 overflow-hidden transition-all duration-200 ${isBoss ? (isUnlocked ? 'border-rose-400 bg-slate-950 shadow-2xl shadow-rose-500/40' : 'border-rose-900/50 bg-slate-900') : isCleared ? 'border-emerald-400 bg-emerald-950 shadow-lg shadow-emerald-500/30' : isUnlocked ? 'border-cyan-400 bg-slate-950 shadow-xl shadow-cyan-500/30' : 'border-slate-700 bg-slate-900'}`}>
+                          {isBoss && (
+                            <>
+                              <div className="absolute inset-[-6px] rounded-full border-2 border-rose-400/30 animate-pulse" />
+                              <div className="absolute inset-[-14px] rounded-full border border-fuchsia-400/20 animate-pulse" />
+                              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-rose-500/10 via-fuchsia-500/10 to-amber-400/10" />
+                            </>
+                          )}
+                          <div className={`absolute inset-0 bg-gradient-to-b ${mon.bgGradient} ${isUnlocked ? 'opacity-50' : 'opacity-20'}`} />
+                          {isUnlocked ? <MonsterPixelArt type={mon.pixelArtType} size={70} /> : <div className="relative z-10 text-3xl">🔒</div>}
+                          {isCleared && <div className="absolute bottom-1 right-1 z-20 w-6 h-6 rounded-full bg-emerald-400 text-slate-950 flex items-center justify-center text-xs font-black">✓</div>}
+                        </div>
+
+                        <div className="mt-3 text-center">
+                          <div className="text-[10px] sm:text-xs text-slate-400 font-bold">推奨 Lv.{mon.level}</div>
+                          <div className={`mt-1 font-black text-xs sm:text-sm max-w-[145px] truncate ${isUnlocked ? 'text-white' : 'text-slate-600'}`}>
+                            {isUnlocked ? `${mon.icon} ${mon.name}` : 'LOCKED'}
+                          </div>
+                          {isCleared && <div className="mt-1 text-[10px] font-black text-emerald-300">✓ CLEAR</div>}
+                          {!isUnlocked && <div className="mt-1 text-[9px] font-bold text-slate-600">前のステージをクリア</div>}
+                        </div>
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-10 flex justify-center">
+                <div className="px-4 py-2 rounded-full bg-cyan-950 border border-cyan-500 text-cyan-300 text-xs font-black">🚩 QUEST START</div>
+              </div>
+            </div>
           </div>
-        </div>
+        </>
       )}
-
-      {/* ============================================================ */}
-      {/* IN-BATTLE RETRO RPG ARENA (ターン制コマンドバトル画面) */}
-      {/* ============================================================ */}
       {inBattle && selectedMonster && (
         <div id="retro-battle-arena" className="space-y-3 sm:space-y-4">
           {/* Top Bar: Battle Stage & Turn */}
@@ -751,6 +917,12 @@ export const BattleView: React.FC<BattleViewProps> = ({
             {/* TOP ROW: MONSTER STATS & SPRITE */}
             <div className="flex justify-between items-start gap-2 z-20">
               {/* Monster Status Box (Left/Center-aligned classic RPG style) */}
+  <img
+  src={worldMapBg}
+  alt=""
+  className="absolute inset-0 w-full h-full object-cover object-top z-0 pointer-events-none"
+/>
+  
               <div className="bg-slate-950/85 backdrop-blur-md p-2 sm:p-3.5 rounded-xl border border-slate-700 w-[160px] xs:w-[185px] sm:w-72 shadow-xl shrink-0">
                 <div className="flex items-center justify-between mb-1">
                   <span className="font-black text-xs sm:text-sm text-white flex items-center gap-1 truncate">
@@ -781,46 +953,56 @@ export const BattleView: React.FC<BattleViewProps> = ({
                   </div>
                 </div>
 
-                {/* Purify Readiness Meter */}
-                <div className="mt-1 sm:mt-2 pt-1 sm:pt-2 border-t border-slate-800 flex items-center justify-between text-[9px] sm:text-[11px]">
-                  <span className="text-slate-400 flex items-center gap-0.5 sm:gap-1">
-                    <Sparkles className="w-3 h-3 text-cyan-400" /> 浄化:
-                  </span>
-                  {isPurifiable ? (
-                    <span className="font-bold text-cyan-300 animate-pulse bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-500/50 text-[9px] sm:text-[10px]">
-                      READY! じょうか可
-                    </span>
-                  ) : (
-                    <span className="text-slate-500 font-mono text-[9px]">HP{selectedMonster.purifyThreshold}%以下</span>
-                  )}
-                </div>
-              </div>
+     {/* Purify Readiness Meter */}
+<div className="mt-1 sm:mt-2 pt-1 sm:pt-2 border-t border-slate-800 flex items-center justify-between text-[9px] sm:text-[11px]">
+  <span className="text-slate-400 flex items-center gap-0.5 sm:gap-1">
+    <Sparkles className="w-3 h-3 text-cyan-400" /> 浄化:
+  </span>
 
-              {/* Monster Pixel Sprite */}
-              <div className="flex flex-col items-center mr-1 sm:mr-4 md:mr-16">
-                <MonsterPixelArt
-                  type={selectedMonster.pixelArtType}
-                  size={100}
-                  isHit={monsterHit}
-                  isAttacking={monsterAttacking}
-                />
-              </div>
-            </div>
+  {isPurifiable ? (
+    <span className="font-bold text-cyan-300 animate-pulse bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-500/50 text-[9px] sm:text-[10px]">
+      READY! じょうか可
+    </span>
+  ) : (
+    <span className="text-slate-500 font-mono text-[9px]">
+      HP{selectedMonster.purifyThreshold}%以下
+    </span>
+  )}
+</div>
 
-            {/* BOTTOM ROW: PLAYER SPRITE & STATS */}
-            <div className="flex justify-between items-end gap-2 z-20">
-              {/* Player 2-Head-High Pixel Avatar Sprite */}
-              <div
-                className={`ml-1 sm:ml-4 md:ml-16 transition-all duration-200 ${
-                  playerHit ? 'brightness-200 -translate-x-2' : ''
-                } ${playerAttacking ? 'translate-x-4 sm:translate-x-6 -translate-y-2' : ''}`}
-              >
-                <AvatarDisplay
-                  avatar={user.avatar}
-                  size={95}
-                  showBackground={false}
-                />
-              </div>
+</div>
+
+{/* Monster Pixel Sprite */}
+<div className="flex flex-col items-center mr-1 sm:mr-4 md:mr-16">
+  <MonsterPixelArt
+    type={selectedMonster.pixelArtType}
+    size={100}
+    isHit={monsterHit}
+    isAttacking={monsterAttacking}
+  />
+</div>
+
+</div>
+
+{/* BOTTOM ROW: PLAYER SPRITE & STATS */}
+<div className="flex justify-between items-end gap-2 z-20">
+
+  {/* Player 2-Head-High Pixel Avatar Sprite */}
+  <div
+    className={`ml-1 sm:ml-4 md:ml-16 transition-all duration-200 ${
+      playerHit ? 'brightness-200 -translate-x-2' : ''
+    } ${
+      playerAttacking
+        ? 'translate-x-4 sm:translate-x-6 -translate-y-2'
+        : ''
+    }`}
+  >
+    <AvatarDisplay
+      avatar={user.avatar}
+      size="lg"
+      showBackground={false}
+    />
+  </div>
 
               {/* Player HP / SP Box */}
               <div className="bg-slate-950/85 backdrop-blur-md p-2 sm:p-3.5 rounded-xl border border-slate-700 w-[160px] xs:w-[185px] sm:w-72 shadow-xl shrink-0">
@@ -961,7 +1143,7 @@ export const BattleView: React.FC<BattleViewProps> = ({
               {activeMenu === 'skills' && (
                 <div className="space-y-1.5 sm:space-y-2 flex-1 max-h-[170px] sm:max-h-[220px] overflow-y-auto pr-1">
                   {SOCIAL_SKILLS.map((skill) => {
-                    const isWeak = selectedMonster.weaknesses.includes(skill.category) || skill.category === 'all';
+                    const isWeak = skill.category === 'all' || selectedMonster.weaknesses.includes(skill.category)
                     const canAfford = playerSp >= skill.spCost;
                     return (
                       <button
@@ -1178,5 +1360,6 @@ export const BattleView: React.FC<BattleViewProps> = ({
         </div>
       )}
     </div>
+    
   );
 };

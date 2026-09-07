@@ -1,4 +1,4 @@
-export type CategoryType = 'environment' | 'support' | 'community' | 'volunteer' | 'learning';
+
 
 export type ContributionTypeId = 
   | 'ecologist'       // 環境系多め
@@ -7,7 +7,12 @@ export type ContributionTypeId =
   | 'volunteerHero'   // ボランティア多め
   | 'socialLearner'   // 学習・啓発多め
   | 'allRounder';     // バランス型
-
+export type CategoryType =
+  | 'environment'
+  | 'support'
+  | 'community'
+  | 'volunteer'
+  | 'learning';
 export interface CategoryInfo {
   id: CategoryType;
   name: string;
@@ -175,6 +180,9 @@ export interface UserProfile {
   name: string;
   title: string;
   level: number;
+  currentXp: number;
+nextLevelXp: number;
+unlockedItems: string[];
   xp: number;
   streakDays: number;
   lastActiveDate: string;
@@ -225,6 +233,7 @@ export interface Monster {
   name: string;
   title: string;
   subtitle: string;
+  mapTheme: 'coast' | 'smog' | 'backyard' | 'cyber' | 'boss';
   level: number;
   category: CategoryType | 'all';
   weaknesses: MonsterWeakness[];

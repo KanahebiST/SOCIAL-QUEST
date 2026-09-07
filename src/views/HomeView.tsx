@@ -341,7 +341,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div className="space-y-1.5">
               {recentContributions.length > 0 ? (
                 recentContributions.map((c) => {
-                  const isQR = c.verificationType === 'qr_scan' || c.verificationType === 'qr';
+                  const isQR = c.verificationType === 'qr';
 
                   return (
                     <div

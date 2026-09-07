@@ -482,7 +482,7 @@ export default function App() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full max-w-6xl mx-auto px-2.5 sm:px-6 pt-3 sm:pt-4 pb-20 sm:pb-24">
+      <main className="flex-1 w-full max-w-6xl mx-auto px-2.5 sm:px-6 pt-3 sm:pt-4 pb-20 sm:pb-24 md:pb-6">
         {currentTab === 'home' && (
           <HomeView
             user={user}
