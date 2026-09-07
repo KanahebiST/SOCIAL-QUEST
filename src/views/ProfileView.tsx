@@ -259,7 +259,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           <div className="p-5 rounded-2xl bg-slate-900/90 pixel-box text-slate-200 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-bold font-pixel text-sm text-amber-300 flex items-center gap-2">
-                <span>⚔️</span> 5大ソーシャル属性パラメーター
+                <span>⚔️</span> 3大ソーシャル属性パラメーター
               </h3>
               <span className="text-xs font-pixel text-slate-400">
                 累計 {totalContributions} アクション

@@ -40,14 +40,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const recentContributions = [...user.contributions].slice(0, 4);
 
   return (
-    <div className="space-y-3 sm:space-y-4 lg:space-y-0 lg:grid lg:grid-cols-12 lg:gap-4 animate-fade-in" id="home-view">
+    <div className="space-y-4 sm:space-y-5 lg:space-y-0 lg:grid lg:grid-cols-12 lg:gap-5 animate-fade-in" id="home-view">
       {/* LEFT COLUMN: 8-Bit Pixel Avatar & Social Tree (4 cols on desktop) */}
-      <div className="lg:col-span-4 space-y-3 sm:space-y-4">
+      <div className="lg:col-span-4 space-y-4 sm:space-y-5">
         {/* Pixel Avatar Stage Card */}
-        <section className="bg-slate-900/90 rounded-2xl pixel-box-gold p-3.5 sm:p-5 flex flex-col items-center justify-center relative overflow-hidden shadow-xl text-slate-200">
+        <section className="bg-slate-900/90 rounded-2xl pixel-box-gold p-4 sm:p-5 flex flex-col items-center justify-center relative overflow-hidden shadow-xl text-slate-200">
           {/* Top Badges */}
-          <div className="w-full flex items-center justify-between mb-1.5 sm:mb-2">
-            <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded bg-slate-950 text-[9px] sm:text-[10px] font-bold font-pixel text-amber-300 border border-slate-800 shadow-sm flex items-center gap-1">
+          <div className="w-full flex items-center justify-between mb-2 sm:mb-2.5">
+            <span className="px-2.5 py-1 rounded bg-slate-950 text-[9px] sm:text-[10px] font-bold font-pixel text-amber-300 border border-slate-800 shadow-sm flex items-center gap-1">
               <span>{typeResult.badge}</span>
               <span className="truncate max-w-[130px] sm:max-w-none">Lv.{user.level} {user.name}</span>
             </span>
@@ -56,7 +56,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 audio.playClick();
                 onOpenAvatarView();
               }}
-              className="px-2 py-0.5 sm:px-2.5 sm:py-1 bg-slate-800 hover:bg-slate-700 rounded text-[9px] sm:text-[10px] font-bold font-pixel text-emerald-400 border border-slate-700 transition flex items-center gap-1 cursor-pointer pixel-btn"
+              className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-[9px] sm:text-[10px] font-bold font-pixel text-emerald-400 border border-slate-700 transition flex items-center gap-1 cursor-pointer pixel-btn"
               id="home-avatar-edit-btn"
             >
               <Shirt className="w-3 h-3 text-emerald-400" />
@@ -65,7 +65,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
 
           {/* Central 8-Bit Avatar Visual */}
-          <div className="my-1.5 sm:my-2">
+          <div className="my-2 sm:my-3">
             <AvatarDisplay
               avatar={user.equippedItems}
               size="lg"
@@ -75,17 +75,17 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
 
           {/* Character Title & Items Badge */}
-          <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-1.5 mt-0.5 mb-2.5 sm:mb-3">
-            <span className="px-2 py-0.5 bg-slate-950 rounded text-[9px] sm:text-[10px] font-bold font-pixel text-amber-300 border border-amber-500/30">
+          <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 mt-1 mb-3 sm:mb-3.5">
+            <span className="px-2.5 py-1 bg-slate-950 rounded text-[9px] sm:text-[10px] font-bold font-pixel text-amber-300 border border-amber-500/30">
               {user.title || typeResult.title}
             </span>
-            <span className="px-2 py-0.5 bg-slate-950 rounded text-[9px] sm:text-[10px] font-bold font-pixel text-emerald-400 border border-emerald-500/30">
+            <span className="px-2.5 py-1 bg-slate-950 rounded text-[9px] sm:text-[10px] font-bold font-pixel text-emerald-400 border border-emerald-500/30">
               所持装備: {user.unlockedItemIds.length} 個
             </span>
           </div>
 
           {/* Action CTAs */}
-          <div className="w-full space-y-1.5 sm:space-y-2">
+          <div className="w-full space-y-2 sm:space-y-2.5">
             {onOpenBattleView && (
               <button
                 type="button"
@@ -93,7 +93,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   audio.playClick();
                   onOpenBattleView();
                 }}
-                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white font-bold font-pixel text-xs pixel-btn flex items-center justify-center gap-1.5 shadow-lg border border-indigo-400/40 animate-pulse"
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white font-bold font-pixel text-xs sm:text-sm pixel-btn flex items-center justify-center gap-2 shadow-lg border border-indigo-400/40 animate-pulse"
                 id="home-quick-battle-btn"
               >
                 <Swords className="w-4 h-4 text-amber-300" />
@@ -107,7 +107,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   audio.playClick();
                   onOpenQRScanner();
                 }}
-                className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold font-pixel text-xs pixel-btn flex items-center justify-center gap-1.5 shadow-lg"
+                className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold font-pixel text-xs sm:text-sm pixel-btn flex items-center justify-center gap-2 shadow-lg"
                 id="home-quick-qr-scan-btn"
               >
                 <Camera className="w-4 h-4" />
@@ -119,7 +119,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 audio.playClick();
                 onOpenContributionModal();
               }}
-              className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold font-pixel text-xs pixel-btn flex items-center justify-center gap-1.5 shadow-lg"
+              className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold font-pixel text-xs sm:text-sm pixel-btn flex items-center justify-center gap-2 shadow-lg"
               id="home-main-record-btn"
             >
               <Plus className="w-4 h-4" />
@@ -129,7 +129,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </section>
 
         {/* Social Tree Progression Card */}
-        <section className="bg-slate-900/90 rounded-2xl pixel-box p-3.5 sm:p-5 shadow-xl text-slate-200 flex flex-col">
+        <section className="bg-slate-900/90 rounded-2xl pixel-box p-4 sm:p-5 shadow-xl text-slate-200 flex flex-col">
           <div className="flex items-center justify-between mb-2">
             <div>
               <span className="text-[9px] font-bold font-press-start text-emerald-400 block">
@@ -186,11 +186,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
       </div>
 
       {/* RIGHT COLUMN: Metrics, Today's Quest, Categories, Activities (8 cols on desktop) */}
-      <div className="lg:col-span-8 space-y-3 sm:space-y-4">
+      <div className="lg:col-span-8 space-y-4 sm:space-y-5">
         {/* 1. Top Metrics Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
           {/* Card 1: Contributions */}
-          <div className="bg-slate-900/90 p-2.5 sm:p-3.5 rounded-xl pixel-box text-slate-200">
+          <div className="bg-slate-900/90 p-3 sm:p-3.5 rounded-xl pixel-box text-slate-200">
             <span className="text-[8px] sm:text-[9px] font-bold font-pixel text-slate-400 uppercase tracking-wider block mb-0.5 sm:mb-1">
               貢献回数
             </span>
