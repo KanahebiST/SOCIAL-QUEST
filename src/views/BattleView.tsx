@@ -807,10 +807,10 @@ const STAGE_BACKDROPS: Record<string, string> = {
                             setShowBossWarning(true);
                             setTimeout(() => {
                               setShowBossWarning(false);
-                              setStagePreview(mon);
+                              handleStartBattle(mon);
                             }, 1300);
                           } else {
-                            setStagePreview(mon);
+                            handleStartBattle(mon);
                           }
                         }}
                         className={`relative z-30 w-[130px] sm:w-[150px] flex flex-col items-center bg-transparent border-0 p-0 transition-all duration-200 ${!isUnlocked ? 'opacity-45 cursor-not-allowed' : 'hover:scale-105 active:scale-95'}`}
@@ -1236,6 +1236,26 @@ const STAGE_BACKDROPS: Record<string, string> = {
                 ))}
                 <div ref={logEndRef} />
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showBossWarning && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-rose-950/90 p-4 backdrop-blur-sm"
+          role="alertdialog"
+          aria-modal="true"
+          aria-label="ボス警告"
+        >
+          <div className="w-full max-w-md animate-pulse rounded-2xl border-4 border-rose-500 bg-slate-950 p-6 text-center shadow-2xl shadow-rose-950/80">
+            <div className="mb-3 text-5xl" aria-hidden="true">⚠️</div>
+            <p className="font-press-start text-xs font-bold tracking-widest text-rose-300">WARNING</p>
+            <h2 className="mt-3 font-press-start text-2xl font-bold text-rose-100">FINAL BOSS</h2>
+            <p className="mt-4 font-pixel text-sm text-rose-200">強大な社会課題の化身が立ちはだかる！</p>
+            <p className="mt-2 font-pixel text-xs text-slate-400">まもなく最終決戦が始まります…</p>
+            <div className="mx-auto mt-5 h-1.5 w-48 overflow-hidden rounded-full bg-rose-950">
+              <div className="h-full w-full origin-left animate-pulse bg-rose-500" />
             </div>
           </div>
         </div>
