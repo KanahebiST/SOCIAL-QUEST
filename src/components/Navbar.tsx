@@ -27,7 +27,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     <nav
   className="
     fixed bottom-0 left-0 right-0 z-40
-    md:static
     bg-slate-950/95
     border-t-2 border-slate-800
     h-14 sm:h-16
