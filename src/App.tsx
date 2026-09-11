@@ -224,6 +224,47 @@ export default function App() {
     });
   };
 
+  // Battle画面から更新されたユーザー情報を受け取り、実績評価も行う
+  const handleBattleUpdateUser = (updatedUser: UserProfile) => {
+    const oldLevel = user.level;
+
+    let evaluatedUser: UserProfile = { ...updatedUser };
+
+    const { updatedAchievements, bonusXp } = evaluateAchievements(evaluatedUser);
+    evaluatedUser.achievements = updatedAchievements;
+    if (bonusXp > 0) {
+      evaluatedUser.currentXp += bonusXp;
+      let newLevel = evaluatedUser.level;
+      let newNextXp = evaluatedUser.nextLevelXp;
+      let newXp = evaluatedUser.currentXp;
+      while (newXp >= newNextXp) {
+        newXp -= newNextXp;
+        newLevel += 1;
+        newNextXp = Math.floor(newNextXp * 1.3);
+      }
+      evaluatedUser.currentXp = newXp;
+      evaluatedUser.level = newLevel;
+      evaluatedUser.nextLevelXp = newNextXp;
+    }
+
+    const newlyUnlocked = checkNewlyUnlockedItems(evaluatedUser, oldLevel, evaluatedUser.level);
+    if (newlyUnlocked.length > 0) {
+      const unlockedIdsSet = new Set(evaluatedUser.unlockedItemIds);
+      newlyUnlocked.forEach((item) => unlockedIdsSet.add(item.id));
+      evaluatedUser.unlockedItemIds = Array.from(unlockedIdsSet);
+    }
+
+    if (evaluatedUser.level > oldLevel) {
+      setLevelUpInfo({
+        newLevel: evaluatedUser.level,
+        unlockedItems: newlyUnlocked,
+      });
+      setIsLevelUpOpen(true);
+    }
+
+    setUser(evaluatedUser);
+  };
+
   // Record a verified QR code recycling action
   const handleConfirmQRVerification = (data: {
     spot: RecyclingSpot;
@@ -525,7 +566,7 @@ export default function App() {
         {currentTab === 'battle' && (
           <BattleView
             user={user}
-            onUpdateUser={setUser}
+            onUpdateUser={handleBattleUpdateUser}
             onUnlockItem={(item) => {
               setUser((prev) => ({
                 ...prev,

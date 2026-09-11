@@ -388,6 +388,17 @@ export function evaluateAchievements(user: UserProfile): {
       currentCount = activeCategoriesCount;
     } else if (ach.id === 'ach_tree_grower') {
       currentCount = user.level;
+    } else if (ach.id === 'ach_first_victory' || ach.id === 'ach_monster_hunter') {
+      currentCount = (user.battleRecords?.defeatedCount || 0) + (user.battleRecords?.purifiedCount || 0);
+    } else if (ach.id === 'ach_peacemaker') {
+      currentCount = user.battleRecords?.purifiedCount || 0;
+    } else if (ach.id === 'ach_stage_conqueror') {
+      currentCount = user.battleRecords?.clearedStages?.length || 0;
+    } else if (ach.id === 'ach_boss_slayer') {
+      const bossId = 'mon_carbon_titan';
+      currentCount =
+        (user.battleRecords?.monstersDefeated?.[bossId] || 0) +
+        (user.battleRecords?.monstersPurified?.[bossId] || 0);
     }
 
     const shouldUnlock = currentCount >= ach.targetCount;
@@ -435,7 +446,12 @@ export function loadUserProfile(): UserProfile {
         unlockedItemIds: Array.from(new Set([...(parsed.unlockedItemIds || INITIAL_USER.unlockedItemIds)])),
         contributions: parsed.contributions || INITIAL_USER.contributions,
         missions: parsed.missions || INITIAL_USER.missions,
-        achievements: parsed.achievements || INITIAL_USER.achievements,
+        achievements: INITIAL_USER.achievements.map((initialAchievement) => {
+          const savedAchievement = (parsed.achievements || []).find(
+            (achievement: UserProfile['achievements'][number]) => achievement.id === initialAchievement.id
+          );
+          return savedAchievement ? { ...initialAchievement, ...savedAchievement } : initialAchievement;
+        }),
         verifications: parsed.verifications || INITIAL_USER.verifications || [],
       });
     }
