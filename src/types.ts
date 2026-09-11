@@ -182,6 +182,7 @@ export interface Achievement {
   currentCount: number;
   unlocked: boolean;
   unlockedAt?: string;
+  claimed: boolean;
   rewardXp: number;
   rewardTitle?: string;
   rewardItemId?: string;

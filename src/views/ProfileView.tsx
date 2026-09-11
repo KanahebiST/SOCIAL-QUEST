@@ -12,12 +12,14 @@ interface ProfileViewProps {
   user: UserProfile;
   onResetData: () => void;
   onLoadPreset: (presetType: 'beginner' | 'explorer' | 'master') => void;
+  onClaimAchievement: (achievementId: string) => void;
 }
 
 export const ProfileView: React.FC<ProfileViewProps> = ({
   user,
   onResetData,
   onLoadPreset,
+  onClaimAchievement,
 }) => {
   const [activeHistoryFilter, setActiveHistoryFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -52,6 +54,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
   const totalContributions = user.contributions.length;
   const unlockedAchievements = user.achievements.filter((a) => a.unlocked);
+  const unclaimedAchievementsCount = user.achievements.filter((a) => a.unlocked && !a.claimed).length;
 
   const handleShareCard = () => {
     audio.playSuccess();
@@ -114,7 +117,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           }`}
           id="profile-tab-achievements"
         >
-          🏆 実績 ({unlockedAchievements.length})
+          🏆 実績 ({unlockedAchievements.length}{unclaimedAchievementsCount > 0 ? ` / 未受取 ${unclaimedAchievementsCount}` : ''})
         </button>
         <button
           onClick={() => {
@@ -338,14 +341,32 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
             {user.achievements.map((ach) => {
-              const isUnlocked = ach.unlocked;
+              const isReadyToClaim = ach.unlocked && !ach.claimed;
+              const isClaimed = ach.unlocked && ach.claimed;
               const percent = Math.min(100, Math.round((ach.currentCount / ach.targetCount) * 100));
+
+              const handleClaimClick = () => {
+                audio.playSuccess();
+                try {
+                  confetti({
+                    particleCount: 60,
+                    spread: 60,
+                    origin: { y: 0.7 },
+                    colors: ['#F59E0B', '#A855F7', '#38BDF8'],
+                  });
+                } catch {
+                  // Ignore
+                }
+                onClaimAchievement(ach.id);
+              };
 
               return (
                 <div
                   key={ach.id}
                   className={`p-3.5 rounded-xl border transition-all flex items-start gap-3 pixel-box ${
-                    isUnlocked
+                    isReadyToClaim
+                      ? 'bg-slate-900 border-amber-400/80 ring-2 ring-amber-400/40 animate-pulse-subtle'
+                      : isClaimed
                       ? 'bg-slate-900 border-purple-500/60 ring-1 ring-purple-500/30'
                       : 'bg-slate-950/80 border-slate-800 opacity-60'
                   }`}
@@ -353,7 +374,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 >
                   <div
                     className={`w-11 h-11 rounded-xl flex items-center justify-center text-2xl shrink-0 ${
-                      isUnlocked ? 'bg-purple-950 border border-purple-400 shadow-md' : 'bg-slate-900 text-slate-600 grayscale'
+                      isReadyToClaim
+                        ? 'bg-amber-950 border border-amber-400 shadow-md'
+                        : isClaimed
+                        ? 'bg-purple-950 border border-purple-400 shadow-md'
+                        : 'bg-slate-900 text-slate-600 grayscale'
                     }`}
                   >
                     {ach.icon}
@@ -363,9 +388,14 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                     <div className="flex items-center justify-between">
                       <h4 className="font-bold font-pixel text-xs text-slate-100 flex items-center gap-1.5">
                         <span>{ach.title}</span>
-                        {isUnlocked && (
+                        {isClaimed && (
                           <span className="text-[9px] font-pixel text-purple-300 bg-purple-950 px-1.5 py-0.2 rounded border border-purple-500/50">
                             達成済み
+                          </span>
+                        )}
+                        {isReadyToClaim && (
+                          <span className="text-[9px] font-pixel text-amber-300 bg-amber-950 px-1.5 py-0.2 rounded border border-amber-500/50">
+                            未受取
                           </span>
                         )}
                       </h4>
@@ -383,7 +413,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                       <div className="flex-1 bg-slate-950 rounded h-1.5 overflow-hidden border border-slate-800">
                         <div
                           className={`h-full rounded ${
-                            isUnlocked ? 'bg-purple-500' : 'bg-slate-700'
+                            isClaimed ? 'bg-purple-500' : isReadyToClaim ? 'bg-amber-400' : 'bg-slate-700'
                           }`}
                           style={{ width: `${percent}%` }}
                         />
@@ -392,6 +422,16 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                         {ach.currentCount} / {ach.targetCount}
                       </span>
                     </div>
+
+                    {isReadyToClaim && (
+                      <button
+                        onClick={handleClaimClick}
+                        id={`claim-achievement-btn-${ach.id}`}
+                        className="mt-2 w-full py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 text-[11px] font-pixel font-bold flex items-center justify-center gap-1.5 hover:brightness-110 active:scale-95 transition-all shadow-md"
+                      >
+                        実績報酬を受け取る (+{ach.rewardXp} XP)
+                      </button>
+                    )}
                   </div>
                 </div>
               );

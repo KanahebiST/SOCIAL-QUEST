@@ -166,13 +166,8 @@ export default function App() {
     };
 
     // Update Achievements
-    const { updatedAchievements, bonusXp } = evaluateAchievements(evaluatedUser);
+    const { updatedAchievements } = evaluateAchievements(evaluatedUser);
     evaluatedUser.achievements = updatedAchievements;
-    if (bonusXp > 0) {
-      evaluatedUser.xp += bonusXp;
-      const reCalc = getLevelForXp(evaluatedUser.xp);
-      evaluatedUser.level = reCalc.level;
-    }
 
     // Dynamic Title Update
     const typeResult = evaluateContributionType(evaluatedUser.contributions);
@@ -230,22 +225,8 @@ export default function App() {
 
     let evaluatedUser: UserProfile = { ...updatedUser };
 
-    const { updatedAchievements, bonusXp } = evaluateAchievements(evaluatedUser);
+    const { updatedAchievements } = evaluateAchievements(evaluatedUser);
     evaluatedUser.achievements = updatedAchievements;
-    if (bonusXp > 0) {
-      evaluatedUser.currentXp += bonusXp;
-      let newLevel = evaluatedUser.level;
-      let newNextXp = evaluatedUser.nextLevelXp;
-      let newXp = evaluatedUser.currentXp;
-      while (newXp >= newNextXp) {
-        newXp -= newNextXp;
-        newLevel += 1;
-        newNextXp = Math.floor(newNextXp * 1.3);
-      }
-      evaluatedUser.currentXp = newXp;
-      evaluatedUser.level = newLevel;
-      evaluatedUser.nextLevelXp = newNextXp;
-    }
 
     const newlyUnlocked = checkNewlyUnlockedItems(evaluatedUser, oldLevel, evaluatedUser.level);
     if (newlyUnlocked.length > 0) {
@@ -342,13 +323,8 @@ export default function App() {
     };
 
     // Update Achievements
-    const { updatedAchievements, bonusXp } = evaluateAchievements(evaluatedUser);
+    const { updatedAchievements } = evaluateAchievements(evaluatedUser);
     evaluatedUser.achievements = updatedAchievements;
-    if (bonusXp > 0) {
-      evaluatedUser.xp += bonusXp;
-      const reCalc = getLevelForXp(evaluatedUser.xp);
-      evaluatedUser.level = reCalc.level;
-    }
 
     // Dynamic Title Update
     const typeResult = evaluateContributionType(evaluatedUser.contributions);
@@ -421,6 +397,44 @@ export default function App() {
       level: newLevel,
       missions: updatedMissions,
       unlockedItemIds: updatedUnlocked,
+    };
+
+    if (newLevel > oldLevel) {
+      const newlyUnlocked = checkNewlyUnlockedItems(updatedUser, oldLevel, newLevel);
+      setLevelUpInfo({
+        newLevel,
+        unlockedItems: newlyUnlocked,
+      });
+      setIsLevelUpOpen(true);
+    }
+
+    setUser(updatedUser);
+  };
+
+  const handleClaimAchievement = (achievementId: string) => {
+    const achievement = user.achievements.find((a) => a.id === achievementId);
+    if (!achievement || !achievement.unlocked || achievement.claimed) return;
+
+    const newXp = user.xp + achievement.rewardXp;
+    const { level: newLevel } = getLevelForXp(newXp);
+    const oldLevel = user.level;
+
+    const updatedUnlockedItems = [...user.unlockedItemIds];
+    if (achievement.rewardItemId && !updatedUnlockedItems.includes(achievement.rewardItemId)) {
+      updatedUnlockedItems.push(achievement.rewardItemId);
+    }
+
+    const updatedAchievements = user.achievements.map((a) =>
+      a.id === achievementId ? { ...a, claimed: true } : a
+    );
+
+    const updatedUser: UserProfile = {
+      ...user,
+      xp: newXp,
+      level: newLevel,
+      achievements: updatedAchievements,
+      unlockedItemIds: updatedUnlockedItems,
+      title: achievement.rewardTitle || user.title,
     };
 
     if (newLevel > oldLevel) {
@@ -611,6 +625,7 @@ export default function App() {
             user={user}
             onResetData={handleResetData}
             onLoadPreset={handleLoadPreset}
+            onClaimAchievement={handleClaimAchievement}
           />
         )}
       </main>

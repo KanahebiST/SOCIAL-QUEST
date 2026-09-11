@@ -361,14 +361,12 @@ export function checkNewlyUnlockedItems(
 export function evaluateAchievements(user: UserProfile): {
   updatedAchievements: UserProfile['achievements'];
   newlyCompleted: UserProfile['achievements'];
-  bonusXp: number;
 } {
   const counts = getCategoryCounts(user.contributions);
   const totalContributions = user.contributions.length;
   const verifiedRecycleCount = getVerifiedRecycleCount(user);
   const activeCategoriesCount = Object.values(counts).filter((c) => c > 0).length;
 
-  let bonusXp = 0;
   const newlyCompleted: UserProfile['achievements'] = [];
 
   const updatedAchievements = user.achievements.map((ach) => {
@@ -405,7 +403,6 @@ export function evaluateAchievements(user: UserProfile): {
     const wasUnlocked = ach.unlocked;
 
     if (shouldUnlock && !wasUnlocked) {
-      bonusXp += ach.rewardXp;
       const updated = {
         ...ach,
         currentCount,
@@ -425,7 +422,6 @@ export function evaluateAchievements(user: UserProfile): {
   return {
     updatedAchievements,
     newlyCompleted,
-    bonusXp,
   };
 }
 
