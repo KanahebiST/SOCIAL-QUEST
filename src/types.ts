@@ -161,6 +161,17 @@ export interface Mission {
   expiresAt: string;
 }
 
+export interface SocialArticle {
+  id: string;
+  title: string;
+  url: string;
+  source: string;
+  category: CategoryType;
+  summary: string;
+  publishedAt?: string;
+  missionId: string;
+}
+
 export interface Achievement {
   id: string;
   title: string;

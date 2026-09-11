@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { UserProfile, Mission } from '../types';
+import { SOCIAL_ARTICLES } from '../data/socialArticles';
 import { Sparkles, CheckCircle2, Clock, Gift, Award, ArrowRight, ShieldCheck } from 'lucide-react';
 import { audio } from '../utils/audio';
 import confetti from 'canvas-confetti';
@@ -9,6 +10,7 @@ interface QuestViewProps {
   onClaimMission: (missionId: string) => void;
   onOpenContributionModal: (cat?: any) => void;
   onOpenQRScanner?: () => void;
+  onReadSocialArticle?: (missionId: string) => void;
 }
 
 export const QuestView: React.FC<QuestViewProps> = ({
@@ -16,6 +18,7 @@ export const QuestView: React.FC<QuestViewProps> = ({
   onClaimMission,
   onOpenContributionModal,
   onOpenQRScanner,
+  onReadSocialArticle,
 }) => {
   const [activeTab, setActiveTab] = useState<'daily' | 'weekly'>('daily');
 
@@ -92,6 +95,40 @@ export const QuestView: React.FC<QuestViewProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Social Article Quests */}
+      <section className="rounded-xl border border-pink-500/50 bg-slate-900 p-4 pixel-box" id="social-article-quests">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <span className="text-[10px] font-bold font-pixel text-pink-300">学習・啓発クエスト</span>
+            <h3 className="font-bold font-pixel text-sm text-slate-100 mt-1">社会問題の記事を読む</h3>
+            <p className="text-xs font-pixel text-slate-400 mt-1">記事を開いて、社会課題を知る一歩を記録しよう。</p>
+          </div>
+          <span className="text-2xl">📰</span>
+        </div>
+
+        <div className="mt-3 space-y-2">
+          {SOCIAL_ARTICLES.map((article) => (
+            <a
+              key={article.id}
+              href={article.url}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => onReadSocialArticle?.(article.missionId)}
+              className="block rounded-lg border border-slate-700 bg-slate-950 p-3 hover:border-pink-400 hover:bg-slate-800 transition"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-xs font-bold font-pixel text-slate-100">{article.title}</p>
+                  <p className="text-[10px] font-pixel text-slate-400 mt-1">{article.summary}</p>
+                  <p className="text-[10px] font-pixel text-pink-300 mt-2">{article.source} ・ {article.publishedAt}</p>
+                </div>
+                <ArrowRight className="w-4 h-4 shrink-0 text-pink-300" />
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
 
       {/* Mission List */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

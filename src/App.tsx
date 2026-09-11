@@ -394,6 +394,21 @@ export default function App() {
     setUser(updatedUser);
   };
 
+  const handleReadSocialArticle = (missionId: string) => {
+    setUser((prev) => ({
+      ...prev,
+      missions: prev.missions.map((mission) => {
+        if (mission.id !== missionId || mission.completed) return mission;
+        const currentCount = Math.min(mission.targetCount, mission.currentCount + 1);
+        return {
+          ...mission,
+          currentCount,
+          completed: currentCount >= mission.targetCount,
+        };
+      }),
+    }));
+  };
+
   // Save Avatar configuration
   const handleSaveAvatar = (newConfig: AvatarConfig) => {
     setUser((prev) => ({
@@ -503,6 +518,7 @@ export default function App() {
             onClaimMission={handleClaimMission}
             onOpenContributionModal={(cat) => handleOpenContribution(cat)}
             onOpenQRScanner={() => handleOpenQRScanner()}
+            onReadSocialArticle={handleReadSocialArticle}
           />
         )}
 
