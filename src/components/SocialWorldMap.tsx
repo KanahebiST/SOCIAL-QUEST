@@ -4,13 +4,13 @@ import { WORLD_AREAS } from '../data/worldMapData';
 
 interface SocialWorldMapProps {
   onSelectArea?: (area: WorldArea) => void;
-  onOpenQRScanner?: () => void;
+  onOpenBarcodeScanner?: () => void;
   onActionClick?: (category: CategoryType) => void;
 }
 
 export const SocialWorldMap: React.FC<SocialWorldMapProps> = ({
   onSelectArea,
-  onOpenQRScanner,
+  onOpenBarcodeScanner,
   onActionClick,
 }) => {
   const [selectedAreaId, setSelectedAreaId] = useState<string>('eco_forest');
@@ -125,13 +125,13 @@ export const SocialWorldMap: React.FC<SocialWorldMapProps> = ({
 
           {/* Action buttons */}
           <div className="mt-4 flex flex-wrap gap-2 pt-2 border-t border-slate-800">
-            {activeArea.category === 'environment' && onOpenQRScanner && (
+            {activeArea.category === 'environment' && onOpenBarcodeScanner && (
               <button
-                id="world-map-btn-qr"
-                onClick={onOpenQRScanner}
+                id="world-map-btn-barcode"
+                onClick={onOpenBarcodeScanner}
                 className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold font-pixel text-xs pixel-btn flex items-center gap-1.5"
               >
-                <span>📷</span> リサイクルQRスキャンで発展させる
+                <span>📷</span> バーコードスキャンで発展させる
               </button>
             )}
             {onActionClick && (

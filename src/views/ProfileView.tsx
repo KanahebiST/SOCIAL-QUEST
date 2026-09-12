@@ -4,7 +4,7 @@ import { evaluateContributionType, getVerifiedRecycleCount } from '../utils/game
 import { CATEGORIES } from '../data/initialData';
 import { AvatarDisplay } from '../components/AvatarDisplay';
 import { CategoryPieChart } from '../components/CategoryPieChart';
-import { Award, Calendar, Flame, Sparkles, Filter, Search, RotateCcw, ShieldCheck, QrCode, MapPin, Share2, Copy, Check } from 'lucide-react';
+import { Award, Calendar, Flame, Sparkles, Filter, Search, RotateCcw, ShieldCheck, MapPin, Share2, Copy, Check } from 'lucide-react';
 import { audio } from '../utils/audio';
 import confetti from 'canvas-confetti';
 
@@ -28,7 +28,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
   const typeResult = evaluateContributionType(user.contributions);
   const verifiedCount = getVerifiedRecycleCount(user);
-  const manualCount = user.contributions.length - user.contributions.filter(c => c.verificationType === 'qr').length;
+  const manualCount = user.contributions.length - user.contributions.filter(c => c.verificationType === 'barcode').length;
 
   // Filter history
   const filteredHistory = user.contributions.filter((c) => {
@@ -36,9 +36,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     if (activeHistoryFilter === 'all') {
       matchesCategory = true;
     } else if (activeHistoryFilter === 'verified') {
-      matchesCategory = c.verificationType === 'qr';
+      matchesCategory = c.verificationType === 'barcode';
     } else if (activeHistoryFilter === 'manual') {
-      matchesCategory = c.verificationType !== 'qr';
+      matchesCategory = c.verificationType !== 'barcode';
     } else {
       matchesCategory = c.category === activeHistoryFilter;
     }
@@ -46,8 +46,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
     const matchesQuery =
       !searchQuery.trim() ||
       c.activityTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (c.memo && c.memo.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (c.spotName && c.spotName.toLowerCase().includes(searchQuery.toLowerCase()));
+      (c.memo && c.memo.toLowerCase().includes(searchQuery.toLowerCase()));
 
     return matchesCategory && matchesQuery;
   });
@@ -191,7 +190,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 <strong className="text-xs sm:text-sm font-pixel text-slate-200">{totalContributions} 回</strong>
               </div>
               <div className="border-x border-slate-800">
-                <span className="text-[9px] font-pixel text-emerald-400 block">♻️ QR認証</span>
+                <span className="text-[9px] font-pixel text-emerald-400 block">♻️ バーコード認証</span>
                 <strong className="text-xs sm:text-sm font-pixel text-emerald-300">{verifiedCount} 本</strong>
               </div>
               <div>
@@ -239,7 +238,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   </span>
                 </div>
                 <p className="text-[11px] font-pixel text-slate-400 mt-0.5">
-                  QR検証完了: <strong className="font-bold text-emerald-300">{verifiedCount} 本</strong> ({verifiedCount * 10} XP獲得) • 手動登録: {manualCount} 件
+                  バーコード認証済み: <strong className="font-bold text-emerald-300">{verifiedCount} 本</strong> ({verifiedCount * 10} XP獲得) • 手動登録: {manualCount} 件
                 </p>
               </div>
             </div>
@@ -477,7 +476,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                 }`}
               >
                 <ShieldCheck className="w-3.5 h-3.5" />
-                <span>QR実機認証 ({user.contributions.filter(c =>c.verificationType === 'qr').length})</span>
+                <span>バーコード認証 ({user.contributions.filter(c => c.verificationType === 'barcode').length})</span>
               </button>
 
               <button
@@ -497,19 +496,19 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {filteredHistory.length > 0 ? (
               filteredHistory.map((c) => {
-                const isQR = c.verificationType === 'qr';
+                const isBarcode = c.verificationType === 'barcode';
 
                 return (
                   <div
                     key={c.id}
                     className={`p-3.5 rounded-xl bg-slate-900 border flex items-center justify-between gap-3 pixel-box ${
-                      isQR ? 'border-emerald-500/60' : 'border-slate-800'
+                      isBarcode ? 'border-emerald-500/60' : 'border-slate-800'
                     }`}
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <div
                         className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0 ${
-                          isQR
+                          isBarcode
                             ? 'bg-emerald-950 border border-emerald-500/60 text-emerald-400'
                             : 'bg-slate-950 border border-slate-800'
                         }`}
@@ -521,10 +520,10 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                           <h4 className="font-bold font-pixel text-xs text-slate-200 truncate">
                             {c.activityTitle}
                           </h4>
-                          {isQR ? (
+                          {isBarcode ? (
                             <span className="text-[9px] font-pixel bg-emerald-950 text-emerald-300 px-1.5 py-0.2 rounded border border-emerald-500/60 shrink-0 inline-flex items-center gap-0.5">
                               <ShieldCheck className="w-2.5 h-2.5" />
-                              <span>QR認証</span>
+                              <span>バーコード認証</span>
                             </span>
                           ) : (
                             <span className="text-[9px] font-pixel bg-slate-800 text-slate-400 px-1.5 py-0.2 rounded shrink-0">
@@ -534,7 +533,6 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                         </div>
                         <p className="text-[10px] font-pixel text-slate-400 truncate">
                           {c.date} • {c.amount} {c.unit}
-                          {c.spotName && ` • 📍${c.spotName}`}
                         </p>
                         {c.memo && (
                           <p className="text-[10px] font-pixel text-amber-300 bg-amber-950/40 px-2 py-0.5 rounded-md inline-block mt-0.5 border border-amber-500/30">
@@ -545,7 +543,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                     </div>
                     <span
                       className={`text-xs font-pixel font-bold px-2 py-1 rounded-lg border shrink-0 ${
-                        isQR
+                        isBarcode
                           ? 'bg-emerald-950 text-emerald-300 border-emerald-500/60'
                           : 'bg-slate-950 text-amber-400 border-slate-800'
                       }`}

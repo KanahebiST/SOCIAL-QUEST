@@ -5,8 +5,6 @@ import {
   AvatarConfig,
   AvatarItem,
   GlobalWorldStats,
-  RecyclingSpot,
-  Verification,
   Contribution,
 } from './types';
 import {
@@ -23,7 +21,6 @@ import {
   INITIAL_USER,
   INITIAL_WORLD_STATS,
   AVATAR_ITEMS,
-  RECYCLING_SPOTS,
 } from './data/initialData';
 import { RPG_ITEMS } from './data/items';
 import { Header } from './components/Header';
@@ -37,8 +34,7 @@ import { ProfileView } from './views/ProfileView';
 import { ContributionModal } from './components/ContributionModal';
 import { LevelUpModal } from './components/LevelUpModal';
 import { WorldTreeModal } from './components/WorldTreeModal';
-import { QRScannerModal } from './components/QRScannerModal';
-import { TestQRCodeModal } from './components/TestQRCodeModal';
+import { BarcodeScannerModal } from './components/BarcodeScannerModal';
 import { audio } from './utils/audio';
 
 export default function App() {
@@ -57,11 +53,8 @@ export default function App() {
     unlockedItems: [],
   });
 
-  // QR Scanner & Test QR Modals
-  const [isQRScannerOpen, setIsQRScannerOpen] = useState<boolean>(false);
-  const [isTestQROpen, setIsTestQROpen] = useState<boolean>(false);
-  const [selectedSpotForScanner, setSelectedSpotForScanner] = useState<RecyclingSpot | undefined>();
-  const [testQRInitialSpotId, setTestQRInitialSpotId] = useState<string | undefined>();
+  // Barcode Scanner Modal
+  const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState<boolean>(false);
 
   // Save changes on state update
   useEffect(() => {
@@ -79,16 +72,8 @@ export default function App() {
     setIsContributionOpen(true);
   };
 
-  // Open QR Scanner helper
-  const handleOpenQRScanner = (spot?: RecyclingSpot) => {
-    setSelectedSpotForScanner(spot);
-    setIsQRScannerOpen(true);
-  };
-
-  // Open Test QR Modal helper
-  const handleOpenTestQRModal = (spotId?: string) => {
-    setTestQRInitialSpotId(spotId);
-    setIsTestQROpen(true);
+  const handleOpenBarcodeScanner = () => {
+    setIsBarcodeScannerOpen(true);
   };
 
   // Record a manual social contribution
@@ -246,13 +231,9 @@ export default function App() {
     setUser(evaluatedUser);
   };
 
-  // Record a verified QR code recycling action
-  const handleConfirmQRVerification = (data: {
-    spot: RecyclingSpot;
-    amount: number;
-    memo?: string;
-  }) => {
-    const earnedXp = data.spot.rewardXP * data.amount;
+  // バーコードスキャン＋自己申告によるペットボトルリサイクルの記録
+  const handleConfirmBarcodeVerification = (data: { barcodeValue: string; selfReported: true }) => {
+    const earnedXp = 10;
     const oldLevel = user.level;
     const newXp = user.xp + earnedXp;
     const { level: calculatedLevel } = getLevelForXp(newXp);
@@ -262,34 +243,23 @@ export default function App() {
       nowStr.getDate()
     ).padStart(2, '0')} ${String(nowStr.getHours()).padStart(2, '0')}:${String(nowStr.getMinutes()).padStart(2, '0')}`;
 
-    const newVerification: Verification = {
-      id: `ver_${Date.now()}`,
-      userId: user.id,
-      spotId: data.spot.id,
-      spotName: data.spot.name,
-      verifiedAt: dateFormatted,
-      rewardXP: earnedXp,
-    };
-
     const newContribution: Contribution = {
-      id: `cnt_qr_${Date.now()}`,
+      id: `cnt_barcode_${Date.now()}`,
       category: 'environment',
       activityId: 'act_bottle_recycle',
-      activityTitle: `${data.spot.name}でペットボトル回収`,
-      icon: '♻️',
-      amount: data.amount,
+      activityTitle: 'ペットボトルのリサイクル',
+      icon: '🧴',
+      amount: 1,
       unit: '本',
       xpEarned: earnedXp,
       date: dateFormatted,
-      memo: data.memo || `QR認証回収BOX (${data.spot.location})`,
-      verificationType: 'qr',
-      spotId: data.spot.id,
-      spotName: data.spot.name,
-      verifiedAt: dateFormatted,
+      memo: 'バーコードスキャン + 自己申告で記録',
+      verificationType: 'barcode',
+      barcodeValue: data.barcodeValue,
+      selfReported: data.selfReported,
     };
 
     const updatedContributions = [newContribution, ...user.contributions];
-    const updatedVerifications = [newVerification, ...(user.verifications || [])];
 
     // Update Missions progress
     const updatedMissions = user.missions.map((m) => {
@@ -298,7 +268,7 @@ export default function App() {
         increment = 1;
       }
       if (m.id === 'mis_daily_1') {
-        increment = data.amount;
+        increment = 1;
       }
       if (m.id === 'mis_weekly_2') {
         increment = earnedXp;
@@ -318,7 +288,6 @@ export default function App() {
       level: calculatedLevel,
       xp: newXp,
       contributions: updatedContributions,
-      verifications: updatedVerifications,
       missions: updatedMissions,
     };
 
@@ -349,28 +318,13 @@ export default function App() {
 
     setUser(evaluatedUser);
 
-    // Update global world tree stats
-    setWorldStats((prev) => {
-      const newTotal = prev.totalContributions + 1;
-      let newWorldLevel = prev.worldTreeLevel;
-      let prevTarget = prev.previousLevelTarget;
-      let curTarget = prev.currentLevelTarget;
+    setWorldStats((prev) => ({
+      ...prev,
+      totalContributions: prev.totalContributions + 1,
+      co2SavedKg: prev.co2SavedKg + 0.5,
+      learningActionsCount: prev.learningActionsCount || 0,
+    }));
 
-      if (newTotal >= curTarget) {
-        newWorldLevel++;
-        prevTarget = curTarget;
-        curTarget = curTarget * 2;
-      }
-
-      return {
-        ...prev,
-        totalContributions: newTotal,
-        worldTreeLevel: newWorldLevel,
-        previousLevelTarget: prevTarget,
-        currentLevelTarget: curTarget,
-        co2SavedKg: prev.co2SavedKg + data.amount * 0.5,
-      };
-    });
   };
 
   // Claim Mission Reward
@@ -501,7 +455,6 @@ export default function App() {
         level: 1,
         xp: 0,
         contributions: [],
-        verifications: [],
         equippedItems: {
           skinColor: 'skin_natural',
           hairStyle: 'hair_short',
@@ -562,7 +515,7 @@ export default function App() {
             onOpenSocialView={() => setCurrentTab('social')}
             onOpenWorldTree={() => setIsWorldTreeOpen(true)}
             onOpenWorldMap={() => setCurrentTab('social')}
-            onOpenQRScanner={() => handleOpenQRScanner()}
+            onOpenBarcodeScanner={handleOpenBarcodeScanner}
             onOpenBattleView={() => setCurrentTab('battle')}
           />
         )}
@@ -572,7 +525,7 @@ export default function App() {
             user={user}
             onClaimMission={handleClaimMission}
             onOpenContributionModal={(cat) => handleOpenContribution(cat)}
-            onOpenQRScanner={() => handleOpenQRScanner()}
+            onOpenBarcodeScanner={handleOpenBarcodeScanner}
             onReadSocialArticle={handleReadSocialArticle}
           />
         )}
@@ -608,8 +561,7 @@ export default function App() {
             user={user}
             onOpenContributionModal={(cat, actId) => handleOpenContribution(cat, actId)}
             onOpenWorldTree={() => setIsWorldTreeOpen(true)}
-            onOpenQRScanner={(spot) => handleOpenQRScanner(spot)}
-            onOpenTestQRModal={(spotId) => handleOpenTestQRModal(spotId)}
+            onOpenBarcodeScanner={handleOpenBarcodeScanner}
           />
         )}
 
@@ -642,29 +594,15 @@ export default function App() {
         isOpen={isContributionOpen}
         onClose={() => setIsContributionOpen(false)}
         onRecordContribution={handleRecordContribution}
+        onOpenBarcodeScanner={handleOpenBarcodeScanner}
         preselectedCategory={preselectedCategory}
         preselectedActivityId={preselectedActivityId}
       />
 
-      {/* QR Code Scanner Verification Modal */}
-      <QRScannerModal
-        isOpen={isQRScannerOpen}
-        onClose={() => setIsQRScannerOpen(false)}
-        user={user}
-        preselectedSpot={selectedSpotForScanner}
-        onConfirmVerification={handleConfirmQRVerification}
-        onOpenTestQRModal={(spotId) => handleOpenTestQRModal(spotId)}
-      />
-
-      {/* Test QR Code Display Modal */}
-      <TestQRCodeModal
-        isOpen={isTestQROpen}
-        onClose={() => setIsTestQROpen(false)}
-        initialSpotId={testQRInitialSpotId}
-        onSelectSpotToScan={(spot) => {
-          setIsTestQROpen(false);
-          handleOpenQRScanner(spot);
-        }}
+      <BarcodeScannerModal
+        isOpen={isBarcodeScannerOpen}
+        onClose={() => setIsBarcodeScannerOpen(false)}
+        onConfirm={handleConfirmBarcodeVerification}
       />
 
       {/* Celebratory Level Up Modal */}

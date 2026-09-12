@@ -39,7 +39,7 @@ export interface ActivityTemplate {
   sdgsNumber?: number;
 }
 
-export type VerificationType = 'manual' | 'qr';
+export type VerificationType = 'manual' | 'barcode';
 
 export interface Contribution {
   id: string;
@@ -53,39 +53,8 @@ export interface Contribution {
   date: string; // ISO date string or YYYY-MM-DD
   memo?: string;
   verificationType: VerificationType;
-  spotId?: string;
-  spotName?: string;
-  verifiedAt?: string;
-}
-
-export interface RecyclingSpot {
-  id: string;
-  name: string;
-  description: string;
-  location: string;
-  rewardXP: number;
-  active: boolean;
-  dailyLimit: number;
-  icon?: string;
-  category?: CategoryType;
-  acceptedItems?: string[];
-  lastUsedDate?: string;
-}
-
-export interface Verification {
-  id: string;
-  userId: string;
-  spotId: string;
-  spotName?: string;
-  verifiedAt: string;
-  rewardXP: number;
-}
-
-export interface QRSpotPayload {
-  type: 'recycling_spot';
-  spotId: string;
-  timestamp?: number;
-  nonce?: string;
+  barcodeValue?: string;
+  selfReported?: boolean;
 }
 
 // 5-Tier RPG Item Rarities
@@ -206,7 +175,6 @@ unlockedItems: string[];
   contributions: Contribution[];
   missions: Mission[];
   achievements: Achievement[];
-  verifications?: Verification[];
   socialCoins?: number;
   battleRecords?: {
     defeatedCount: number;

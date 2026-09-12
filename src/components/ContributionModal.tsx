@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { CategoryType, ActivityTemplate, Contribution } from '../types';
 import { CATEGORIES, ACTIVITIES } from '../data/initialData';
 import { audio } from '../utils/audio';
-import { X, Plus, Minus, CheckCircle, Sparkles, ShieldCheck, Camera, MapPin, QrCode, ArrowRight } from 'lucide-react';
+import { X, Plus, Minus, CheckCircle, Sparkles, ShieldCheck, Camera, MapPin, ArrowRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface ContributionModalProps {
@@ -18,7 +18,7 @@ interface ContributionModalProps {
     xpEarned: number;
     memo?: string;
   }) => void;
-  onOpenQRScanner?: () => void;
+  onOpenBarcodeScanner?: () => void;
   preselectedCategory?: CategoryType;
   preselectedActivityId?: string;
 }
@@ -27,7 +27,7 @@ export const ContributionModal: React.FC<ContributionModalProps> = ({
   isOpen,
   onClose,
   onRecordContribution,
-  onOpenQRScanner,
+  onOpenBarcodeScanner,
   preselectedCategory = 'environment',
   preselectedActivityId,
 }) => {
@@ -171,8 +171,8 @@ export const ContributionModal: React.FC<ContributionModalProps> = ({
 
         {/* Modal Body */}
         <form onSubmit={handleSubmit} className="p-5 overflow-y-auto space-y-3.5 flex-1">
-          {/* Prominent QR Code Verification CTA Banner */}
-          {onOpenQRScanner && (
+          {/* Prominent Barcode Verification CTA Banner */}
+          {onOpenBarcodeScanner && (
             <div className="p-3 bg-slate-950 border border-emerald-500/50 rounded-xl flex items-center justify-between gap-3 pixel-box-emerald">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="w-8 h-8 rounded-lg bg-emerald-950 border border-emerald-500 text-emerald-300 flex items-center justify-center text-base shrink-0">
@@ -180,11 +180,11 @@ export const ContributionModal: React.FC<ContributionModalProps> = ({
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-bold font-pixel text-emerald-300 truncate">QRコードで実機リサイクル認証</span>
+                    <span className="text-xs font-bold font-pixel text-emerald-300 truncate">バーコードをスキャンして記録</span>
                     <span className="text-[9px] bg-emerald-600 text-slate-950 px-1 py-0.2 rounded font-bold font-pixel shrink-0">公式認証</span>
                   </div>
                   <p className="text-[10px] text-slate-400 font-pixel truncate">
-                    回収BOXのQRをカメラで直接読み取って確実にXP獲得
+                    商品のバーコードをカメラで読み取り、自己申告でXP獲得
                   </p>
                 </div>
               </div>
@@ -192,13 +192,13 @@ export const ContributionModal: React.FC<ContributionModalProps> = ({
                 type="button"
                 onClick={() => {
                   onClose();
-                  onOpenQRScanner();
+                  onOpenBarcodeScanner();
                 }}
                 className="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-slate-950 text-xs font-bold font-pixel shrink-0 flex items-center gap-1 pixel-btn"
-                id="open-qr-scanner-from-modal-btn"
+                id="open-barcode-scanner-from-modal-btn"
               >
-                <QrCode className="w-3.5 h-3.5" />
-                <span>QR認証へ</span>
+                  <Camera className="w-3.5 h-3.5" />
+                  <span>バーコードスキャンへ</span>
                 <ArrowRight className="w-3 h-3" />
               </button>
             </div>

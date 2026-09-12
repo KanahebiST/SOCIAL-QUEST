@@ -171,7 +171,7 @@ export const SocialTreeDisplay: React.FC<SocialTreeDisplayProps> = ({
           </g>
         )}
 
-        {/* QR Recycling Verified Fruits (実る黄金の果実) */}
+        {/* Barcode Verified Fruits (実る黄金の果実) */}
         {actualVerifiedCount > 0 && (
           <g id="pixel-verified-fruits">
             <rect x="28" y="36" width="6" height="6" fill="#F59E0B" className="animate-pixel-float" />

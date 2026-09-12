@@ -16,7 +16,7 @@ interface HomeViewProps {
   onOpenSocialView: () => void;
   onOpenWorldTree: () => void;
   onOpenWorldMap?: () => void;
-  onOpenQRScanner?: () => void;
+  onOpenBarcodeScanner?: () => void;
   onOpenBattleView?: () => void;
 }
 
@@ -28,7 +28,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onOpenSocialView,
   onOpenWorldTree,
   onOpenWorldMap,
-  onOpenQRScanner,
+  onOpenBarcodeScanner,
   onOpenBattleView,
 }) => {
   const typeResult = evaluateContributionType(user.contributions);
@@ -101,18 +101,18 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 <span>⚔️ モンスター討伐・浄化バトルへ</span>
               </button>
             )}
-            {onOpenQRScanner && (
+            {onOpenBarcodeScanner && (
               <button
                 type="button"
                 onClick={() => {
                   audio.playClick();
-                  onOpenQRScanner();
+                  onOpenBarcodeScanner();
                 }}
                 className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold font-pixel text-xs sm:text-sm pixel-btn flex items-center justify-center gap-2 shadow-lg"
-                id="home-quick-qr-scan-btn"
+                id="home-quick-barcode-scan-btn"
               >
                 <Camera className="w-4 h-4" />
-                <span>♻️ QRリサイクル認証 (実機)</span>
+                <span>♻️ バーコードでリサイクル記録</span>
               </button>
             )}
             <button
@@ -206,10 +206,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </span>
           </div>
 
-          {/* Card 2: QR Verified */}
+          {/* Card 2: Barcode Verified */}
           <div className="bg-slate-900/90 p-2.5 sm:p-3.5 rounded-xl pixel-box-emerald text-slate-200">
             <span className="text-[8px] sm:text-[9px] font-bold font-pixel text-emerald-400 uppercase tracking-wider block mb-0.5 sm:mb-1">
-              QR実機認証
+              バーコード認証
             </span>
             <div className="flex items-baseline gap-1">
               <span className="text-lg sm:text-2xl font-bold font-press-start text-emerald-400">
@@ -352,13 +352,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div className="space-y-1.5">
               {recentContributions.length > 0 ? (
                 recentContributions.map((c) => {
-                  const isQR = c.verificationType === 'qr';
+                  const isBarcode = c.verificationType === 'barcode';
 
                   return (
                     <div
                       key={c.id}
                       className={`flex items-center justify-between p-2 rounded-xl bg-slate-950 border ${
-                        isQR ? 'border-emerald-500/50' : 'border-slate-800'
+                        isBarcode ? 'border-emerald-500/50' : 'border-slate-800'
                       }`}
                     >
                       <div className="flex items-center gap-2 min-w-0">
@@ -370,9 +370,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
                             <h4 className="font-bold font-pixel text-xs text-slate-200 truncate">
                               {c.activityTitle}
                             </h4>
-                            {isQR && (
+                            {isBarcode && (
                               <span className="text-[8px] font-pixel bg-emerald-950 text-emerald-300 px-1 py-0.2 rounded border border-emerald-500/50 shrink-0">
-                                QR認証
+                                バーコード認証
                               </span>
                             )}
                           </div>
@@ -383,7 +383,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       </div>
                       <span
                         className={`text-xs font-bold font-pixel px-1.5 py-0.5 rounded border shrink-0 ${
-                          isQR
+                          isBarcode
                             ? 'text-emerald-300 bg-emerald-950 border-emerald-500/50'
                             : 'text-amber-400 bg-slate-900 border-slate-800'
                         }`}

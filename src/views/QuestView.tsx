@@ -9,7 +9,7 @@ interface QuestViewProps {
   user: UserProfile;
   onClaimMission: (missionId: string) => void;
   onOpenContributionModal: (cat?: any) => void;
-  onOpenQRScanner?: () => void;
+  onOpenBarcodeScanner?: () => void;
   onReadSocialArticle?: (missionId: string) => void;
 }
 
@@ -17,7 +17,7 @@ export const QuestView: React.FC<QuestViewProps> = ({
   user,
   onClaimMission,
   onOpenContributionModal,
-  onOpenQRScanner,
+  onOpenBarcodeScanner,
   onReadSocialArticle,
 }) => {
   const [activeTab, setActiveTab] = useState<'daily' | 'weekly'>('daily');
@@ -226,12 +226,12 @@ export const QuestView: React.FC<QuestViewProps> = ({
                   </div>
                 ) : (
                   <div className="w-full flex gap-2">
-                    {m.category === 'environment' && onOpenQRScanner && (
+                    {m.category === 'environment' && onOpenBarcodeScanner && (
                       <button
-                        onClick={onOpenQRScanner}
+                        onClick={onOpenBarcodeScanner}
                         className="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold font-pixel text-xs pixel-btn flex items-center justify-center gap-1 shrink-0"
                       >
-                        <span>📷</span> QR認証
+                          <span>📷</span> バーコード記録
                       </button>
                     )}
                     <button

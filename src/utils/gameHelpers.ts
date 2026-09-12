@@ -5,16 +5,12 @@ import {
   UserProfile,
   AvatarItem,
   GlobalWorldStats,
-  RecyclingSpot,
-  Verification,
-  QRSpotPayload,
 } from '../types';
 import {
   AVATAR_ITEMS,
   LEVEL_THRESHOLDS,
   INITIAL_USER,
   INITIAL_WORLD_STATS,
-  RECYCLING_SPOTS,
   getLevelForXp,
 } from '../data/initialData';
 
@@ -56,10 +52,7 @@ export function getCategoryCounts(contributions: Contribution[]): Record<Categor
 }
 
 export function getVerifiedRecycleCount(user: UserProfile): number {
-  if (user.verifications && user.verifications.length > 0) {
-    return user.verifications.length;
-  }
-  return user.contributions.filter((c) => c.verificationType === 'qr').length;
+  return user.contributions.filter((c) => c.verificationType === 'barcode').length;
 }
 
 export function getVerificationRate(user: UserProfile): {
@@ -108,133 +101,6 @@ function applyDailyLoginBonus(user: UserProfile): UserProfile {
     lastActiveDate: today,
     lastLoginBonusDate: today,
     socialCoins: (user.socialCoins || 0) + DAILY_LOGIN_COINS,
-  };
-}
-
-export function isSpotUsedToday(spotId: string, user: UserProfile): boolean {
-  const todayPrefix = getTodayDateString();
-  
-  // Check in user verifications
-  if (user.verifications) {
-    const verifiedToday = user.verifications.some(
-      (v) => v.spotId === spotId && (v.verifiedAt.startsWith(todayPrefix) || v.verifiedAt.includes(todayPrefix))
-    );
-    if (verifiedToday) return true;
-  }
-
-  // Check in user contributions
-  return user.contributions.some(
-    (c) => c.spotId === spotId && c.verificationType === 'qr' && c.date.startsWith(todayPrefix)
-  );
-}
-
-export function validateRecyclingQR(
-  qrString: string,
-  spots: RecyclingSpot[] = RECYCLING_SPOTS,
-  user?: UserProfile
-): {
-  valid: boolean;
-  spot?: RecyclingSpot;
-  error?: string;
-  errorCode?: 'INVALID_FORMAT' | 'NOT_RECYCLING_TYPE' | 'NOT_FOUND' | 'INACTIVE' | 'DAILY_LIMIT_REACHED' | 'EXPIRED';
-} {
-  if (!qrString || typeof qrString !== 'string') {
-    return {
-      valid: false,
-      error: 'QRコードの内容を読み取れませんでした。',
-      errorCode: 'INVALID_FORMAT',
-    };
-  }
-
-  const trimmed = qrString.trim();
-  let spotId = '';
-
-  // Try JSON parse
-  if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
-    try {
-      const parsed: QRSpotPayload = JSON.parse(trimmed);
-      if (parsed.type !== 'recycling_spot') {
-        return {
-          valid: false,
-          error: 'このQRコードはSOCIAL QUESTのリサイクル認証用ではありません。',
-          errorCode: 'NOT_RECYCLING_TYPE',
-        };
-      }
-      if (!parsed.spotId) {
-        return {
-          valid: false,
-          error: 'リサイクルスポットIDが含まれていません。',
-          errorCode: 'INVALID_FORMAT',
-        };
-      }
-      // Check timestamp if present (> 24 hours old dynamic QR safeguard)
-      if (parsed.timestamp) {
-        const now = Date.now();
-        if (parsed.timestamp > now + 600000 || parsed.timestamp < now - 86400000) {
-          return {
-            valid: false,
-            error: 'このQRコードは期限切れです。最新のコードをスキャンしてください。',
-            errorCode: 'EXPIRED',
-          };
-        }
-      }
-      spotId = parsed.spotId;
-    } catch {
-      return {
-        valid: false,
-        error: 'このQRコードはSOCIAL QUESTで認証できません。',
-        errorCode: 'INVALID_FORMAT',
-      };
-    }
-  } else {
-    // Plain spot ID or URL pattern
-    if (trimmed.startsWith('RECYCLE-') || trimmed.startsWith('TEST-RECYCLE-')) {
-      spotId = trimmed;
-    } else if (trimmed.includes('spotId=')) {
-      const match = trimmed.match(/spotId=([A-Za-z0-9_-]+)/);
-      if (match && match[1]) {
-        spotId = match[1];
-      }
-    } else {
-      return {
-        valid: false,
-        error: 'このQRコードはSOCIAL QUESTで認証できません。',
-        errorCode: 'NOT_RECYCLING_TYPE',
-      };
-    }
-  }
-
-  // Find registered spot
-  const spot = spots.find((s) => s.id.toUpperCase() === spotId.toUpperCase());
-  if (!spot) {
-    return {
-      valid: false,
-      error: `登録されていないリサイクルスポットです。(ID: ${spotId})`,
-      errorCode: 'NOT_FOUND',
-    };
-  }
-
-  if (!spot.active) {
-    return {
-      valid: false,
-      error: 'このリサイクルスポットは現在メンテナンス中・休止中です。',
-      errorCode: 'INACTIVE',
-    };
-  }
-
-  // Check daily limit if user profile provided
-  if (user && isSpotUsedToday(spot.id, user)) {
-    return {
-      valid: false,
-      spot,
-      error: 'このリサイクルスポットでは本日の認証が完了しています。また明日ご利用ください。',
-      errorCode: 'DAILY_LIMIT_REACHED',
-    };
-  }
-
-  return {
-    valid: true,
-    spot,
   };
 }
 
@@ -448,7 +314,6 @@ export function loadUserProfile(): UserProfile {
           );
           return savedAchievement ? { ...initialAchievement, ...savedAchievement } : initialAchievement;
         }),
-        verifications: parsed.verifications || INITIAL_USER.verifications || [],
       });
     }
   } catch (e) {
