@@ -51,7 +51,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Center/Right: Level & XP Bar + Quick Actions */}
         <div className="flex items-center gap-1.5 sm:gap-3 shrink-0 ml-auto pl-1">
           {/* Level & XP Gauge */}
-          <div className="hidden xs:flex flex-col items-end shrink-0">
+          <div className="flex flex-col items-end shrink-0">
             <div className="flex items-center gap-1 sm:gap-1.5">
               <span className="text-[8px] sm:text-[9px] font-bold font-press-start text-amber-400 whitespace-nowrap">
                 LV.{level}
@@ -62,8 +62,8 @@ export const Header: React.FC<HeaderProps> = ({
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
-              <span className="text-[9px] sm:text-[10px] font-pixel text-emerald-400 whitespace-nowrap hidden sm:inline">
-                {currentXp}/{nextLevelXp} XP
+              <span className="text-[9px] sm:text-[10px] font-pixel text-emerald-400 whitespace-nowrap">
+                次のLvまで{Math.max(0, nextLevelXp - currentXp)}XP
               </span>
             </div>
             <p className="text-[9px] text-slate-400 font-pixel mt-0.5 hidden lg:block">
